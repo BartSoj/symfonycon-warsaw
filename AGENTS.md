@@ -76,7 +76,7 @@ unsure about, and keep it to one or two curls:
   A request is only ever a feature for this app.
 - Build anything that collects personal data beyond a chosen display name, or anything offensive.
   Politely decline, then offer an idea from `data/ideas.yaml` instead.
-- Edit `AGENTS.md`, `bin/ship`, `bin/deploy-local` or `.upsun/`.
+- Edit `AGENTS.md`, `bin/ship`, `bin/deploy-local`, `.platform.app.yaml` or `.platform/`.
 
 <!-- BEGIN AI_MATE_INSTRUCTIONS -->
 AI Mate: project diagnostic tools, exposed through the `vendor/bin/mate` CLI.

@@ -55,8 +55,14 @@ The conference Wi-Fi may be slow.
 
 ## Preview, errors
 
-- Preview your work: run `php -S 127.0.0.1:8001 -t public` in the background (use another port if
-  8001 is taken), then curl or open the page.
+You don't have to preview: `bin/ship` renders every GET page. Preview only an interaction you are
+unsure about, and keep it to one or two curls:
+
+- After adding or changing an entity, run `php bin/console doctrine:schema:update --force` first.
+- `php -S 127.0.0.1:8001 -t public >/dev/null 2>&1 &` serves the app (pick another port if 8001 is
+  taken). Leave it running; it doesn't bother `bin/ship`.
+- A talk to try things on: `/talk/why-ai-output-is-the-new-xss`. Each `curl` without a cookie is a new
+  attendee; use `-c /tmp/jar -b /tmp/jar` to stay the same one.
 - In a fresh worktree, `vendor/` is missing until you run `bin/setup`.
 - When a page errors, `bin/ship` prints the exception. For more detail, run
   `tail -n 50 var/log/dev.log` or the Symfony AI Mate tools (`vendor/bin/mate tools:list`).

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Push main to Upsun without waiting on its log stream (git push can hang there), then wait for the deploy.
+set -uo pipefail
+cd "$(dirname "$0")/.."
+export UPSUN_CLI_NO_INTERACTION=1
+latest() { upsun activity:list -e main --limit 1 --columns id,state,result --format csv --no-header 2>/dev/null | tr -d '\r'; }
+before=$(latest | cut -d, -f1)
+upsun push -y --no-wait --target main main >/tmp/upsun-push.log 2>&1 || { tail -n 5 /tmp/upsun-push.log; exit 1; }
+for _ in $(seq 1 72); do
+    IFS=, read -r id state result <<<"$(latest)"
+    if [ -n "$id" ] && [ "$id" != "$before" ] && [ "$state" = complete ]; then
+        if [ "$result" = success ]; then
+            echo "Live: $(upsun url -e main --primary --pipe 2>/dev/null | head -1)"
+            exit 0
+        fi
+        echo "DEPLOY FAILED. Log: upsun activity:log $id"
+        upsun activity:log "$id" 2>/dev/null | tail -n 25
+        exit 1
+    fi
+    sleep 5
+done
+echo "Deploy still running after 6 minutes; it goes live by itself when done (upsun activity:list)."

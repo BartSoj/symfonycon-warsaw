@@ -59,6 +59,6 @@ else
     bin/deploy-local
 fi
 if git remote get-url origin >/dev/null 2>&1; then
-    git push -q origin main 2>/dev/null || echo "(GitHub push failed; the feature is shipped anyway)"
+    GIT_TERMINAL_PROMPT=0 git push -q origin main 2>/dev/null || echo "(GitHub push failed; the feature is shipped anyway)"
 fi
 echo "SHIPPED: $(git log -1 --format=%s main)"

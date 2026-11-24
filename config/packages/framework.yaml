@@ -1,6 +1,9 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
+    # Behind Upsun or the Cloudflare tunnel: trust the proxy so URLs (and the TV's QR code) use https.
+    trusted_proxies: 'REMOTE_ADDR'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true

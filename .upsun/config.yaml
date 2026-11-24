@@ -4,8 +4,6 @@ applications:
     type: "php:8.4"
     source:
       root: "/"
-    runtime:
-      extensions: [pdo_sqlite, intl]
     variables:
       env:
         APP_ENV: prod
@@ -13,7 +11,7 @@ applications:
     build:
       flavor: none
     mounts:
-      "var":
+      "/var":
         source: storage
         source_path: var
     web:

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Serve this checkout publicly without Upsun: prod mode on 127.0.0.1:8000 plus a Cloudflare quick tunnel.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+grep -qs '^APP_ENV=prod' .env.local || printf 'APP_ENV=prod\nAPP_DEBUG=0\n' >> .env.local
+bin/deploy-local
+php -S 127.0.0.1:8000 -t public > var/log/server.log 2>&1 &
+trap 'kill %1' EXIT
+cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8000 2>&1 | grep --line-buffered -o 'https://[a-z0-9-]*\.trycloudflare\.com' | sed -u 's|$|/tv   <- open this on the TV|'

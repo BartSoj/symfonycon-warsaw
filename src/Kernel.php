@@ -1,0 +1,25 @@
+<?php
+
+namespace App;
+
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
+class Kernel extends BaseKernel
+{
+    use MicroKernelTrait;
+
+    public function boot(): void
+    {
+        date_default_timezone_set('Europe/Warsaw'); // the conference's time; all dates are Warsaw time
+        parent::boot();
+    }
+
+    /**
+     * @return list<string> An array of allowed values for APP_ENV
+     */
+    private function getAllowedEnvs(): array
+    {
+        return ['prod', 'dev'];
+    }
+}

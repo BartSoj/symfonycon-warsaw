@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SymfonyCon Live on TV{% endblock %}
+
+{% block body %}
+    <meta http-equiv="refresh" content="20">
+    <div class="tv">
+        <div class="tv-qr">
+            <img src="{{ qr }}" alt="QR code to {{ url }}">
+            <p><b>Scan, then tell the agent what to build.</b><br><span class="muted">{{ url }}</span></p>
+        </div>
+        <div>
+            <p class="big"><b>{{ shipped()|length }}</b> features shipped by <b>{{ builders()|length }}</b> SymfonyCon attendees</p>
+            <h2>Just shipped</h2>
+            {% for feature in shipped()|slice(0, 5) %}
+                <div class="card"><b>{{ feature.title }}</b> <span class="muted">· {{ feature.by }} · {{ feature.at|date('H:i') }}</span></div>
+            {% else %}
+                <div class="card muted">Nothing yet. Yours could be first.</div>
+            {% endfor %}
+            <h2>Up for grabs</h2>
+            {% for idea in ideas()|filter(i => not i.shipped)|slice(0, 4) %}
+                <div class="card"><b>{{ idea.title }}</b> <span class="muted">· {{ idea.pitch }}</span></div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

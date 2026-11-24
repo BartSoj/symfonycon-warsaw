@@ -1,0 +1,86 @@
+# Ideas shown on /ideas and the TV. bin/ship marks one shipped when you pass its id.
+# level: quick (about 2 min), medium (about 5 min), big (10 min or more)
+- id: star-talks
+  title: ⭐ Star talks and get my own agenda
+  pitch: A star on every talk, and a "My agenda" page with the talks you starred.
+  level: medium
+- id: now-next
+  title: Now and next
+  pitch: At the top of the schedule, what's on right now in each room and what comes next.
+  level: quick
+- id: reactions
+  title: 🔥 👏 🤯 reactions on talks
+  pitch: Tap an emoji on a talk page, and everyone sees the live counts.
+  level: quick
+- id: rate-talks
+  title: Rate a talk
+  pitch: Give 1 to 5 stars once a talk has ended, and see the average on the talk page.
+  level: medium
+- id: top-talks
+  title: Most loved talks
+  pitch: A leaderboard of the talks with the most stars, ratings or reactions.
+  level: medium
+- id: search
+  title: Search the schedule
+  pitch: Type to filter talks by title, speaker or theme.
+  level: quick
+- id: themes
+  title: Filter by theme
+  pitch: Chips for AI, performance, Doctrine, security… that filter the schedule.
+  level: quick
+- id: speakers
+  title: Speaker pages
+  pitch: Tap a speaker's name to see all of their talks.
+  level: quick
+- id: calendar
+  title: Add to my calendar
+  pitch: An .ics download for a talk, or for your whole agenda.
+  level: quick
+- id: ask-speaker
+  title: Ask the speaker
+  pitch: Post a question on a talk page, and upvote the best ones before the Q&A.
+  level: medium
+- id: guestbook
+  title: The conference guestbook
+  pitch: Leave a message for SymfonyCon, like the app in the Symfony book.
+  level: medium
+- id: suggest-ideas
+  title: Suggest an idea from your phone
+  pitch: A form on this page, so anyone can add an idea to this list.
+  level: medium
+- id: vote-ideas
+  title: Vote for the next feature
+  pitch: Upvote ideas, and the most wanted one floats to the top and onto the TV.
+  level: medium
+- id: hackday-board
+  title: Hackday team board
+  pitch: Post a project for Saturday's Hackday, and let others join your team.
+  level: medium
+- id: bingo
+  title: Conference bingo
+  pitch: A personal bingo card with things like "it depends" and "this is a breaking change", and tap to mark them.
+  level: medium
+- id: countdown
+  title: Countdown to the party
+  pitch: Time left until the next break, lunch, or Thursday's Community Evening.
+  level: quick
+- id: polish
+  title: Po polsku
+  pitch: Switch the whole site to Polish.
+  level: medium
+- id: trivia
+  title: Symfony trivia
+  pitch: A question of the hour about Symfony's history, with a scoreboard.
+  level: medium
+- id: json-api
+  title: A JSON API for the schedule
+  pitch: /api/talks and /api/talks/{slug}, for anyone who wants to build their own client.
+  level: quick
+- id: mcp-server
+  title: An MCP server for the schedule
+  pitch: So your own AI agent can ask "what's on after lunch?".
+  level: big
+- id: hall-of-fame
+  title: Builders' hall of fame
+  pitch: Everyone who asked for a feature, with what they shipped.
+  level: quick

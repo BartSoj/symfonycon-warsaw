@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Ship what you built: check every page, record it on /shipped, commit, merge into main, deploy.
+# Usage: bin/ship "Feature title" "Name of the person who asked" [idea-id from data/ideas.yaml]
+#        bin/ship --continue   (after you resolved a rebase conflict)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+if [ "${1:-}" = --continue ]; then
+    resume=1
+else
+    resume=
+    title=${1:?'Usage: bin/ship "Feature title" "Name of the person who asked" [idea-id]'}
+    by=${2:-a SymfonyCon attendee}
+    idea=${3:-}
+fi
+
+check() {
+    export APP_ENV=dev APP_DEBUG=1  # always check in dev, even where bin/serve set prod
+    [ -d vendor ] || composer install -q --no-interaction
+    php bin/console doctrine:schema:update --force -q
+    php bin/console app:seed -q
+    php bin/console lint:container -q
+    php bin/console lint:twig templates -q
+    php bin/console lint:yaml config data -q
+    php bin/console app:check
+}
+
+echo "== Checking every page"
+check
+
+# One ship at a time; others wait here.
+lock="$(git rev-parse --git-common-dir)/ship.lock"
+until mkdir "$lock" 2>/dev/null; do echo "Another ship is running, waiting…"; sleep 3; done
+trap 'rmdir "$lock"' EXIT
+
+if [ -z "$resume" ]; then
+    echo "== Committing"
+    php bin/console app:record-shipped "$title" "$by" --idea="$idea"
+    git add -A
+    git commit -q -m "$title" -m "Asked for by $by at the JetBrains booth, SymfonyCon Warsaw 2026."
+fi
+
+branch=$(git branch --show-current)
+if [ "$branch" != main ]; then
+    echo "== Merging $branch into main"
+    if ! git rebase -q main; then
+        echo "REBASE CONFLICT with features shipped meanwhile. Fix the conflicted files (keep both sides),"
+        echo "then run: git add -A && GIT_EDITOR=true git rebase --continue && bin/ship --continue"
+        exit 1
+    fi
+    check
+    git push -q . HEAD:main
+fi
+
+if git remote get-url upsun >/dev/null 2>&1; then
+    echo "== Deploying to Upsun (1–3 minutes)"
+    git push upsun main:main 2>&1 | tail -n 12
+else
+    echo "== Updating the local server"
+    bin/deploy-local
+fi
+echo "SHIPPED: $(git log -1 --format=%s main)"

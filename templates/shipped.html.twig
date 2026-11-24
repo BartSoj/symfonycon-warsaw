@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shipped · SymfonyCon Live{% endblock %}
+
+{% block body %}
+    <h1>Shipped at the booth</h1>
+    <p class="muted">Every feature on this site was asked for by someone at SymfonyCon and built by an AI agent in PhpStorm.</p>
+
+    {% for feature in shipped() %}
+        <div class="card">
+            <b>{{ feature.title }}</b><br>
+            <span class="muted">asked for by {{ feature.by }} · {{ feature.at|date('l H:i') }}</span>
+        </div>
+    {% else %}
+        <div class="card">Nothing yet. <a href="{{ path('ideas') }}">Be the first →</a></div>
+    {% endfor %}
+{% endblock %}

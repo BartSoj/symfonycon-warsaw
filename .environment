@@ -1,0 +1,2 @@
+# Sourced by Upsun at runtime: a real secret per project instead of the demo one in .env.
+export APP_SECRET="${PLATFORM_PROJECT_ENTROPY:-${APP_SECRET:-}}"

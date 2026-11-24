@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ talk.title }} · SymfonyCon Live{% endblock %}
+
+{% block body %}
+    <p><a href="{{ path('home') }}">← Schedule</a></p>
+    <h1>{{ talk.title }}</h1>
+    <p class="muted">
+        {{ talk.startsAt|date('l H:i') }}–{{ talk.endsAt|date('H:i') }}{% if talk.room %} · {{ talk.room }}{% endif %}
+    </p>
+    {% if talk.speakers %}<p><b>{{ talk.speakers|join(', ') }}</b></p>{% endif %}
+    {% if talk.abstract %}<p>{{ talk.abstract }}</p>{% endif %}
+    {% for tag in talk.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+{% endblock %}

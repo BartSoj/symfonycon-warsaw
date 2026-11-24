@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>SymfonyCon Warsaw 2026</h1>
+    <p class="muted">26–27 November · Hilton Warsaw City · times are Warsaw time</p>
+
+    {% for day, talks in days %}
+        <h2>{{ day }}</h2>
+        {% for talk in talks %}
+            {% if talk.isSession %}
+                <a class="card slot" href="{{ path('talk', {slug: talk.slug}) }}">
+                    <span class="time">{{ talk.startsAt|date('H:i') }}</span>
+                    <span>
+                        <b>{{ talk.title }}</b><br>
+                        <span class="muted">{{ talk.speakers|join(', ') }}{% if talk.room %} · {{ talk.room }}{% endif %}</span>
+                    </span>
+                </a>
+            {% else %}
+                <div class="slot pause">
+                    <span class="time">{{ talk.startsAt|date('H:i') }}</span>
+                    <span class="muted">{{ talk.title }}{% if talk.type == 'social' or talk.type == 'other' and talk.room %} · {{ talk.room }}{% endif %}</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

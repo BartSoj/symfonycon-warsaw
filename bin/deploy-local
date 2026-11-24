@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Refresh the main checkout after a ship when there is no Upsun remote (bin/serve serves it).
+set -euo pipefail
+main=$(git -C "$(dirname "$0")/.." worktree list --porcelain | head -1 | cut -d' ' -f2)
+cd "$main"
+[ -d vendor ] || composer install -q --no-interaction
+php bin/console doctrine:schema:update --force -q
+php bin/console app:seed -q
+if grep -qs '^APP_ENV=prod' .env.local; then
+    php bin/console asset-map:compile -q
+    php bin/console cache:clear -q
+fi

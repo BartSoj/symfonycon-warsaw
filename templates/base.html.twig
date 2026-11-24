@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SymfonyCon Live{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    {% block javascripts %}{{ importmap('app') }}{% endblock %}
+</head>
+<body>
+<header class="top">
+    <div class="wrap">
+        <a class="brand" href="{{ path('home') }}">⚡ SymfonyCon <b>Live</b></a>
+        <nav>
+            {# Add a link here for every new page #}
+            <a href="{{ path('home') }}">Schedule</a>
+            <a href="{{ path('ideas') }}">Ideas</a>
+            <a href="{{ path('shipped') }}">Shipped</a>
+        </nav>
+    </div>
+</header>
+<main class="wrap">
+    {% block body %}{% endblock %}
+</main>
+<footer class="wrap muted">
+    Built live by SymfonyCon attendees with AI agents in PhpStorm, at the JetBrains booth.
+    <a href="{{ path('shipped') }}">{{ shipped()|length }} features by {{ builders()|length }} people so far</a>.
+    <a href="{{ path('ideas') }}">Add yours →</a>
+</footer>
+</body>
+</html>

@@ -167,3 +167,11 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 #cc-no { touch-action: none; }
 .cc-box { position: relative; padding-bottom: 9rem; overflow: hidden; }
 #cc-no { position: absolute; width: 9.5rem; white-space: nowrap; overflow: hidden; background: hsl(0,85%,50%); color: #fff; border: 0; transition: left .2s ease-out, top .2s ease-out, background .2s; }
+
+/* Star rating */
+.rating { margin-top: 1rem; text-align: center; }
+.stars { display: flex; justify-content: center; gap: .25rem; }
+.star { background: none; border: 0; font-size: 2.4rem; line-height: 1; cursor: pointer; color: var(--muted); padding: .1rem; opacity: .4; }
+.star.on { color: #f5b301; opacity: 1; }
+.stars:hover .star { color: #f5b301; opacity: 1; }
+.stars .star:hover ~ .star { color: var(--muted); opacity: .4; }

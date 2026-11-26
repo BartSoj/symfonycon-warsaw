@@ -11,4 +11,16 @@
     {% if talk.speakers %}<p><b>{{ talk.speakers|join(', ') }}</b></p>{% endif %}
     {% if talk.abstract %}<p>{{ talk.abstract }}</p>{% endif %}
     {% for tag in talk.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+
+    <div class="card rating">
+        <form method="post" class="stars">
+            {% for i in 1..5 %}
+                <button type="submit" name="stars" value="{{ i }}" class="star{{ i <= myStars ? ' on' }}" aria-label="{{ i }} stars">★</button>
+            {% endfor %}
+        </form>
+        <p class="muted">
+            {% if avgStars %}{{ avgStars }} / 5 · {{ voteCount }} vote{{ voteCount > 1 ? 's' }}{% else %}Be the first to rate this talk{% endif %}
+            {% if myStars %} · you gave {{ myStars }}★{% endif %}
+        </p>
+    </div>
 {% endblock %}

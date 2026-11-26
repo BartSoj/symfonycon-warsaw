@@ -20,9 +20,37 @@ class PageController extends AbstractController
     }
 
     #[Route('/talk/{slug}', name: 'talk')]
-    public function talk(#[MapEntity(mapping: ['slug' => 'slug'])] Talk $talk): Response
+    public function talk(#[MapEntity(mapping: ['slug' => 'slug'])] Talk $talk, \App\Attendee $attendee, \Symfony\Component\HttpFoundation\Request $request): Response
     {
-        return $this->render('talk.html.twig', ['talk' => $talk]);
+        $file = $this->getParameter('kernel.project_dir').'/var/ratings.json';
+        $fh = fopen($file, 'c+');
+        flock($fh, LOCK_EX);
+        $all = json_decode(stream_get_contents($fh) ?: '{}', true) ?: [];
+
+        if ($request->isMethod('POST')) {
+            $stars = (int) $request->request->get('stars');
+            if ($stars >= 1 && $stars <= 5) {
+                $all[$talk->slug][$attendee->id()] = $stars;
+                ftruncate($fh, 0);
+                rewind($fh);
+                fwrite($fh, json_encode($all, JSON_PRETTY_PRINT));
+            }
+            flock($fh, LOCK_UN);
+            fclose($fh);
+
+            return $this->redirectToRoute('talk', ['slug' => $talk->slug]);
+        }
+        flock($fh, LOCK_UN);
+        fclose($fh);
+
+        $votes = $all[$talk->slug] ?? [];
+
+        return $this->render('talk.html.twig', [
+            'talk' => $talk,
+            'myStars' => $votes[$attendee->id()] ?? 0,
+            'avgStars' => $votes ? round(array_sum($votes) / count($votes), 1) : null,
+            'voteCount' => count($votes),
+        ]);
     }
 
     #[Route('/speakers', name: 'speakers')]

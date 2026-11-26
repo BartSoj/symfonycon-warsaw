@@ -30,6 +30,7 @@
             </span>
             <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
             <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat)">🐀</button>
+            <button class="rat-toggle" id="snow-btn" title="Let it snow" onclick="snowToggle()">❄️</button>
         </nav>
     </div>
 </header>
@@ -158,6 +159,14 @@ place(bx,by);no.textContent=T[Math.random()*T.length|0];no.style.background=`hsl
 const rel=e=>{const r=box.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top]};
 box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.offsetTop;if(mx>x-50&&mx<x+no.offsetWidth+50&&my>y-50&&my<y+no.offsetHeight+50)run(mx,my)});
 ['pointerdown','touchstart','click'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();last=0;run(...rel(e))}))})();
+</script>
+<script>
+(()=>{let iv=null;const box=document.createElement('div');box.className='snow-box';document.body.appendChild(box);
+function flake(){const f=document.createElement('span');f.className='snowflake';f.textContent=Math.random()<.5?'❄':'•';
+f.style.left=Math.random()*100+'vw';f.style.fontSize=.5+Math.random()*1.2+'rem';f.style.opacity=.5+Math.random()*.5;
+const d=5+Math.random()*7;f.style.animationDuration=d+'s';f.style.setProperty('--drift',(Math.random()*120-60)+'px');box.appendChild(f);setTimeout(()=>f.remove(),d*1000)}
+function set(on){document.getElementById('snow-btn')?.classList.toggle('on',on);clearInterval(iv);iv=null;if(on)iv=setInterval(flake,150);else box.innerHTML=''}
+window.snowToggle=()=>{localStorage.snow=localStorage.snow?'':'1';set(!!localStorage.snow)};set(!!localStorage.snow)})();
 </script>
 </body>
 </html>

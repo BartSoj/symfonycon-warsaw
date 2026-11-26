@@ -183,3 +183,7 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 .star.on { color: #f5b301; opacity: 1; }
 .stars:hover .star { color: #f5b301; opacity: 1; }
 .stars .star:hover ~ .star { color: var(--muted); opacity: .4; }
+
+.snow-box { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+.snowflake { position: absolute; top: -2rem; color: #fff; text-shadow: 0 0 3px #8ab; animation: snowfall linear forwards; }
+@keyframes snowfall { to { transform: translate(var(--drift), 105vh) rotate(360deg); } }

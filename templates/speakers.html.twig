@@ -7,6 +7,7 @@
     <input type="search" id="speaker-search" class="speaker-search" placeholder="Search speakers…" autocomplete="off">
     <p class="muted" id="speaker-count">{{ speakers|length }} speakers</p>
 
+    <div id="speaker-list">
     {% for speaker, talks in speakers %}
         <div class="card speaker" data-name="{{ speaker|lower }}">
             <b class="speaker-name">{{ speaker }}</b>
@@ -16,21 +17,23 @@
             {% endfor %}
         </div>
     {% endfor %}
+    </div>
 
     <script>
         const input = document.getElementById('speaker-search');
-        const cards = document.querySelectorAll('.speaker');
+        const cards = [...document.querySelectorAll('.speaker')];
+        const list = document.getElementById('speaker-list');
         input.addEventListener('input', () => {
             const q = input.value.trim().toLowerCase();
-            let hits = 0, first = null;
+            const hits = [], rest = [];
             cards.forEach(c => {
                 const match = q !== '' && c.dataset.name.includes(q);
                 c.classList.toggle('hit', match);
                 c.classList.toggle('dim', q !== '' && !match);
-                if (match) { hits++; first ??= c; }
+                (match ? hits : rest).push(c);
             });
-            document.getElementById('speaker-count').textContent = q ? hits + ' matching' : cards.length + ' speakers';
-            first?.scrollIntoView({behavior: 'smooth', block: 'center'});
+            list.append(...hits, ...rest);
+            document.getElementById('speaker-count').textContent = q ? hits.length + ' matching' : cards.length + ' speakers';
         });
     </script>
 {% endblock %}

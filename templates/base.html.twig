@@ -42,13 +42,21 @@
 ".TBBBBBBBBBBBB..",
 "..TBBBBBBBBBB...",
 "...F.F....F.F..."],rats=[],h=()=>Math.random()*360|0;
-function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0,fl=Math.random()<.5;
+function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0;
 c.width=16;c.height=9;const x=c.getContext('2d'),col={B:`hsl(${hu},${Math.random()*60|0}%,${l}%)`,E:`hsl(${hu},40%,${Math.min(l+20,85)}%)`,P:`hsl(${330+Math.random()*30|0},80%,75%)`,k:['#000','#e00','#06f'][Math.random()*3|0],N:'#f6a',T:`hsl(${h()},70%,70%)`,F:'#f9c'},spot=`hsl(${h()},70%,50%)`,sp=Math.random()<.6;
-R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&sp&&Math.random()<.18?spot:col[ch];x.fillRect(fl?15-i:i,y,1,1)}));
+R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&sp&&Math.random()<.18?spot:col[ch];x.fillRect(i,y,1,1)}));
 Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});
-document.body.appendChild(c);rats.push(c);
+c.vx=(Math.random()<.5?-1:1)*(1+Math.random()*3);c.vy=(Math.random()-.5)*3;c.px=parseFloat(c.style.left);c.py=parseFloat(c.style.top);document.body.appendChild(c);rats.push(c);
 if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
-rat();setInterval(rat,10000)})();
+const no=new Set([document.documentElement,document.body]);
+function tick(){const W=innerWidth,H=innerHeight;rats.forEach(c=>{const w=c.offsetWidth,hh=c.offsetHeight;
+if(Math.random()<.02)c.vy=(Math.random()-.5)*3;c.px+=c.vx;c.py+=c.vy;
+if(c.px<0||c.px>W-w){c.vx*=-1;c.px=Math.max(0,Math.min(W-w,c.px))}if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}
+c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=c.vx<0?'scaleX(-1)':'';
+const e=document.elementFromPoint(c.px+(c.vx>0?w:0),c.py+hh/2);
+if(e&&!no.has(e)&&e.tagName!='CANVAS'&&e.offsetWidth*e.offsetHeight<W*H/6){e.style.transition='opacity .3s,transform .3s';e.style.opacity=0;e.style.transform='scale(.3)';e.style.pointerEvents='none';no.add(e)}});
+requestAnimationFrame(tick)}
+rat();setInterval(rat,10000);tick()})();
 </script>
 </body>
 </html>

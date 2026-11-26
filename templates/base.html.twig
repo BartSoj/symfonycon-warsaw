@@ -21,6 +21,7 @@
             <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
             <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
             <button class="theme-toggle" title="Light / dark" onclick="var h=document.documentElement,d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme: dark)').matches),t=d?'light':'dark';h.classList.remove('light','dark');h.classList.add(t);localStorage.theme=t"><span>🐘</span></button>
+            <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
             <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat)">🐀</button>
         </nav>
     </div>
@@ -35,13 +36,18 @@
     <div class="ec-hint">psst… the evil corp has 5 letters: <input id="ec-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="10" placeholder="e____"></div>
     <div class="kc-hint">↑↑↓↓←→←→BA <span>(swipe it on your phone, then tap twice)</span></div>
 </footer>
+<div id="kc-pad" hidden><div class="kc-pad-box"><p>Enter the cheat code</p><div id="kc-show">&nbsp;</div>
+<div class="kc-dpad"><span></span><button data-k="ArrowUp">▲</button><span></span><button data-k="ArrowLeft">◀</button><span></span><button data-k="ArrowRight">▶</button><span></span><button data-k="ArrowDown">▼</button><span></span></div>
+<div class="kc-ab"><button data-k="b">B</button><button data-k="a">A</button></div><button class="btn-outline btn" onclick="document.getElementById('kc-pad').hidden=true">close</button></div></div>
 <div id="kc" hidden><div class="kc-box"><div class="kc-big">🐘</div><h1>CHEAT UNLOCKED</h1><p>+30 LIVES · INFINITE COFFEE · ALL TALKS IN 8-BIT</p><button class="btn" onclick="document.getElementById('kc').hidden=true">CONTINUE ▶</button></div></div>
 <script>
 (()=>{const S=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let b=[];
-const push=k=>{b=[...b,k].slice(-10);if(b.join()==S.join()){b=[];go()}};
+const L={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→',b:'B',a:'A'};
+const push=k=>{b=[...b,k].slice(-10);document.getElementById('kc-show').textContent=b.map(x=>L[x]||'').join(' ')||'\u00a0';if(b.join()==S.join()){b=[];document.getElementById('kc-pad').hidden=true;go()}};
+document.querySelectorAll('#kc-pad [data-k]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();push(x.dataset.k)}));
 document.addEventListener('keydown',e=>push(e.key.length==1?e.key.toLowerCase():e.key));
 let sx,sy;addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+addEventListener('touchend',e=>{if(e.target.closest('#kc-pad'))return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
 if(Math.max(Math.abs(dx),Math.abs(dy))<30){push(b.length==8?'b':'a');return}
 push(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'))},{passive:true});
 function go(){document.body.classList.add('kc-on');document.getElementById('kc').hidden=false;

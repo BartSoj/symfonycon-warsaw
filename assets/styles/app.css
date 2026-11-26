@@ -146,3 +146,14 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 .kc-big { font-size: 6rem; animation: kc-bounce .6s infinite alternate; }
 @keyframes kc-bounce { to { transform: translateY(-20px) scale(1.1) rotate(10deg); } }
 @keyframes kc-pulse { to { transform: scale(1.06); } }
+
+#kc-pad { position: fixed; inset: 0; z-index: 105; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+#kc-pad[hidden] { display: none; }
+.kc-pad-box { background: #222; color: #fff; border-radius: 1.5rem; padding: 1.2rem; text-align: center; font-family: ui-monospace, monospace; }
+#kc-show { min-height: 1.5em; font-size: 1.2rem; color: #0f0; margin-bottom: .8rem; }
+.kc-dpad { display: grid; grid-template-columns: repeat(3, 3.5rem); grid-template-rows: repeat(3, 3.5rem); gap: .2rem; margin: 0 auto; width: max-content; }
+.kc-pad-box button[data-k] { border: 0; border-radius: .6rem; background: #444; color: #fff; font-size: 1.4rem; cursor: pointer; }
+.kc-pad-box button[data-k]:active { background: var(--accent); }
+.kc-ab { display: flex; gap: 1rem; justify-content: center; margin: 1rem 0; }
+.kc-ab button[data-k] { width: 3.8rem; height: 3.8rem; border-radius: 50% !important; background: #c0392b !important; font-weight: bold; }
+.kc-open { filter: none; opacity: 1; }

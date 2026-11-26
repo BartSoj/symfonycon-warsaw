@@ -20,7 +20,14 @@
             <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
             <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
             <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
-            <button class="theme-toggle" title="Light / dark" onclick="var h=document.documentElement,d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme: dark)').matches),t=d?'light':'dark';h.classList.remove('light','dark');h.classList.add(t);localStorage.theme=t"><span>🐘</span></button>
+            <span class="theme-pick">
+                <button class="rat-toggle kc-open" id="theme-btn" type="button" title="Theme" aria-haspopup="true" aria-expanded="false">🖌️</button>
+                <span class="theme-menu" id="theme-menu" hidden>
+                    <button type="button" data-theme="light">☀️ Light</button>
+                    <button type="button" data-theme="dark">🌙 Dark</button>
+                    <button type="button" data-theme="phpstorm">🐘 PhpStorm</button>
+                </span>
+            </span>
             <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
             <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat)">🐀</button>
         </nav>
@@ -36,6 +43,15 @@
     <div class="ec-hint">psst… the evil corp has 5 letters: <input id="ec-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="10" placeholder="e____"></div>
     <div class="kc-hint">↑↑↓↓←→←→BA <span>(swipe it on your phone, then tap twice)</span></div>
 </footer>
+<script>
+(()=>{const btn=document.getElementById('theme-btn'),menu=document.getElementById('theme-menu'),h=document.documentElement,T=['light','dark','phpstorm'];
+const cur=()=>T.find(t=>h.classList.contains(t))||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+const mark=()=>menu.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('on',b.dataset.theme==cur()));
+const show=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',o)};
+btn.addEventListener('click',()=>{mark();show(menu.hidden)});
+menu.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>{h.classList.remove(...T);h.classList.add(b.dataset.theme);localStorage.theme=b.dataset.theme;mark();show(false)}));
+document.addEventListener('click',e=>{if(!e.target.closest('.theme-pick'))show(false)})})();
+</script>
 <div id="kc-pad" hidden><div class="kc-pad-box"><p>Enter the cheat code</p><div id="kc-show">&nbsp;</div>
 <div class="kc-dpad"><span></span><button data-k="ArrowUp">▲</button><span></span><button data-k="ArrowLeft">◀</button><span></span><button data-k="ArrowRight">▶</button><span></span><button data-k="ArrowDown">▼</button><span></span></div>
 <div class="kc-ab"><button data-k="b">B</button><button data-k="a">A</button></div><button class="btn-outline btn" onclick="document.getElementById('kc-pad').hidden=true">close</button></div></div>

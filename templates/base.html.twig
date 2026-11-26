@@ -201,41 +201,6 @@ if(tgt){const r=tgt.getBoundingClientRect();a=Math.atan2(r.top+r.height/2-y,r.le
 S.style.transform=`translate(${x-20}px,${y-20}px) rotate(${a+Math.PI/4}rad)`;requestAnimationFrame(tick)};tick()})();
 </script>
 <div id="lake" aria-hidden="true"></div>
-<script>
-(()=>{const h=document.documentElement,L=document.getElementById('lake');
-const on=()=>!h.classList.contains('dark')&&!h.classList.contains('phpstorm')&&!h.classList.contains('mode-night')&&(h.classList.contains('mode-day')||h.classList.contains('light')||!matchMedia('(prefers-color-scheme: dark)').matches);
-let rays='';for(let i=0;i<14;i++){const a=(-170+i*12+Math.random()*4)*Math.PI/180,w=.025+Math.random()*.03,R=1400;
-rays+=`<polygon points="500,395 ${500+Math.cos(a-w)*R},${395+Math.sin(a-w)*R} ${500+Math.cos(a+w)*R},${395+Math.sin(a+w)*R}" fill="url(#ray)" opacity="${.25+Math.random()*.35}"/>`}
-const trees=(y,n,c,hmin,hmax)=>{let t='';for(let i=0;i<n;i++){const x=i*1000/n+Math.random()*12-6,hh=hmin+Math.random()*(hmax-hmin),w=hh*.32;
-t+=`<polygon points="${x},${y-hh} ${x-w},${y} ${x+w},${y}" fill="${c}"/>`}return t+`<rect x="0" y="${y-2}" width="1000" height="8" fill="${c}"/>`};
-let glints='';for(let i=0;i<18;i++){const y=405+i*i*.6,w=60-i*1.5+Math.random()*30;glints+=`<rect class="lake-glint" style="animation-delay:${-Math.random()*3}s" x="${500-w/2+Math.random()*16-8}" y="${y}" width="${w}" height="2" rx="1" fill="#fff6d0"/>`}
-L.innerHTML=`<svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax slice"><defs>
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fa8dc"/><stop offset=".45" stop-color="#f9c9a0"/><stop offset=".66" stop-color="#ffb36b"/></linearGradient>
-<radialGradient id="sun"><stop offset="0" stop-color="#fffbe6"/><stop offset=".25" stop-color="#ffe9a8"/><stop offset=".6" stop-color="#ffd07a" stop-opacity=".5"/><stop offset="1" stop-color="#ffb36b" stop-opacity="0"/></radialGradient>
-<linearGradient id="ray" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff8dc" stop-opacity=".9"/><stop offset="1" stop-color="#fff8dc" stop-opacity="0"/></linearGradient>
-<linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0b27a"/><stop offset=".3" stop-color="#7f9fc0"/><stop offset="1" stop-color="#2e4a6b"/></linearGradient>
-</defs><rect width="1000" height="600" fill="url(#sky)"/>
-<g class="lake-rays">${rays}</g><circle cx="500" cy="395" r="260" fill="url(#sun)"/><circle cx="500" cy="395" r="38" fill="#fffbe6"/>
-${trees(398,70,'#5d7a6e',18,40)}${trees(402,45,'#2f4f3e',30,70)}
-<rect y="400" width="1000" height="200" fill="url(#water)"/><ellipse cx="500" cy="402" rx="90" ry="6" fill="#fff3c4" opacity=".8"/>${glints}
-<g opacity=".25" transform="translate(0,804) scale(1,-1)">${trees(402,45,'#1e3a2c',30,70)}</g></svg><canvas></canvas>`;
-const cv=L.querySelector('canvas'),x=cv.getContext('2d');let W,H;const rs=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight};rs();addEventListener('resize',rs);
-const bugs=[],birds=[],spark=[];const bug=()=>({x:Math.random()*W,y:H*.25+Math.random()*H*.5,t:Math.random()*9});
-for(let i=0;i<14;i++)bugs.push(bug());for(let i=0;i<4;i++)birds.push({x:Math.random()*W,y:Math.random()*H*.5,vx:0,vy:0,f:Math.random()*9});
-const tick=()=>{requestAnimationFrame(tick);if(!h.classList.contains('scene'))return;x.clearRect(0,0,W,H);
-bugs.forEach(b=>{b.t+=.05;b.x+=Math.sin(b.t*1.3)*1.6;b.y+=Math.cos(b.t*1.7)*1.2;x.fillStyle='#3a2a10';x.beginPath();x.arc(b.x,b.y,2.5,0,7);x.fill();
-x.fillStyle='rgba(255,255,255,.7)';x.beginPath();x.ellipse(b.x-2,b.y-3,2.5,1.2,0,0,7);x.ellipse(b.x+2,b.y-3,2.5,1.2,0,0,7);x.fill();
-x.fillStyle='rgba(255,240,120,.35)';x.beginPath();x.arc(b.x,b.y,6,0,7);x.fill()});
-birds.forEach(B=>{let t=null,d=1e9;bugs.forEach(b=>{const e=Math.hypot(b.x-B.x,b.y-B.y);if(e<d){d=e;t=b}});
-if(t){B.vx+=(t.x-B.x)/d*.25;B.vy+=(t.y-B.y)/d*.25;if(d<10){bugs.splice(bugs.indexOf(t),1);for(let i=0;i<8;i++)spark.push({x:t.x,y:t.y,vx:Math.random()*4-2,vy:Math.random()*4-2,l:30});setTimeout(()=>bugs.push(bug()),1500)}}
-const s=Math.hypot(B.vx,B.vy);if(s>4.5){B.vx*=4.5/s;B.vy*=4.5/s}B.x+=B.vx;B.y+=B.vy;B.f+=.3;
-const a=Math.atan2(B.vy,B.vx),fl=Math.sin(B.f)*9;x.save();x.translate(B.x,B.y);x.rotate(a);
-x.fillStyle=`rgba(255,${120+Math.random()*100|0},40,.9)`;x.beginPath();x.moveTo(-12,-2);x.lineTo(-22-Math.random()*8,0);x.lineTo(-12,2);x.fill();
-x.fillStyle='#2b3550';x.beginPath();x.moveTo(14,0);x.lineTo(-12,-4);x.lineTo(-12,4);x.fill();
-x.fillStyle='#4b5d86';x.beginPath();x.moveTo(4,0);x.quadraticCurveTo(-4,-14-fl,-14,-20-fl);x.lineTo(-6,0);x.quadraticCurveTo(-4,14+fl,-14,20+fl);x.closePath();x.fill();
-x.fillStyle='#7ff';x.beginPath();x.arc(7,-1,2,0,7);x.fill();x.restore()});
-for(let i=spark.length-1;i>=0;i--){const p=spark[i];p.x+=p.vx;p.y+=p.vy;if(--p.l<0){spark.splice(i,1);continue}x.fillStyle=`rgba(255,230,120,${p.l/30})`;x.fillRect(p.x,p.y,2,2)}};
-const upd=()=>h.classList.toggle('scene',on());upd();tick();document.addEventListener('click',()=>setTimeout(upd,0));matchMedia('(prefers-color-scheme: dark)').addEventListener('change',upd)})();
-</script>
+<script src="/lake.js?v=2"></script>
 </body>
 </html>

@@ -236,3 +236,7 @@ html.scene footer { background: rgba(255,255,255,.6); border-radius: 12px; }
 html.scene.mode-day { --bg: #f7f8fa; --fg: #1e1f22; --muted: #5b5f6b; --card: #fff; --line: #ebecf0; --accent: #3574f0; --accent-fg: #fff; color-scheme: light; }
 html.scene.mode-day .top, html.scene.mode-day main, html.scene.mode-day footer { filter: none; }
 html.scene.mode-day::after { display: none; }
+html.scene .card, html.scene .top { background: rgba(255,255,255,.55); border-color: rgba(255,255,255,.6); }
+html.scene footer { background: rgba(255,255,255,.45); }
+.lake-ray { opacity: .55; animation: lake-ray 6s ease-in-out infinite alternate; }
+@keyframes lake-ray { from { opacity: .2; } to { opacity: .75; } }

@@ -100,13 +100,27 @@ class PageController extends AbstractController
         return $this->render('shipped.html.twig');
     }
 
+    #[Route('/merch', name: 'merch')]
+    public function merch(): Response
+    {
+        return $this->render('merch.html.twig', ['items' => self::MERCH]);
+    }
+
+    /** The goodies at the JetBrains booth, shown in 3D on /merch and on the TV. */
+    public const MERCH = [
+        ['model' => '/model.glb', 'orbit' => 'auto 70deg 80%', 'name' => 'Alt+Enter fidget toy', 'pitch' => 'The most pressed shortcut in PhpStorm, now for your fingers. Click it all day.'],
+        ['model' => '/3d/phpstorm-pin.glb', 'orbit' => 'auto 75deg 110%', 'name' => 'PhpStorm pin', 'pitch' => 'For your lanyard, bag or jacket.'],
+        ['model' => '/3d/jetbrains-pin.glb', 'orbit' => 'auto 75deg 110%', 'name' => 'JetBrains pin', 'pitch' => 'The black square, in metal.'],
+        ['model' => '/3d/jetbrains-lanyard.glb', 'orbit' => 'auto 60deg 70%', 'name' => 'JetBrains lanyard', 'pitch' => 'Hang your badge on it, and the pins too.'],
+    ];
+
     /** For the booth TV: QR code to the app, what's been shipped, ideas to pick. Refreshes itself. */
     #[Route('/tv', name: 'tv')]
     public function tv(): Response
     {
         $url = $this->generateUrl('home', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return $this->render('tv.html.twig', ['url' => $url, 'qr' => (new QRCode())->render($url)]);
+        return $this->render('tv.html.twig', ['url' => $url, 'qr' => (new QRCode())->render($url), 'merch' => self::MERCH]);
     }
 
     #[Route('/lang/{code}', name: 'lang', defaults: ['code' => 'en'])]

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Merch'|t }} · SymfonyCon Live{% endblock %}
+
+{% block body %}
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
+    <h1>🎁 {{ 'PhpStorm merch'|t }}</h1>
+    <p class="muted">Come to the JetBrains booth and grab one. Drag to spin them.</p>
+    <div class="merch">
+        {% for item in items %}
+            <div class="card merch-item">
+                <model-viewer src="{{ item.model }}" alt="{{ item.name }}" camera-controls auto-rotate shadow-intensity="1" tone-mapping="neutral" camera-orbit="{{ item.orbit }}" min-camera-orbit="auto auto 30%" loading="{{ loop.first ? 'eager' : 'lazy' }}"></model-viewer>
+                <h2>{{ item.name }}</h2>
+                <p class="muted">{{ item.pitch }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

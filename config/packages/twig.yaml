@@ -4,3 +4,8 @@ twig:
 when@test:
     twig:
         strict_variables: true
+
+# Booth server runs in prod: pick up template changes after every ship without cache:clear
+when@prod:
+    twig:
+        auto_reload: true

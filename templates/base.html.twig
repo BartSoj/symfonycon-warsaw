@@ -31,7 +31,33 @@
     {{ 'Built live by SymfonyCon attendees with AI agents in PhpStorm, at the JetBrains booth.'|t }}
     <a href="{{ path('shipped') }}">{{ shipped()|length }} {{ 'features by'|t }} {{ builders()|length }} {{ 'people so far'|t }}</a>.
     <a href="{{ path('ideas') }}">{{ 'Add yours →'|t }}</a>
+    <div class="ec-hint">psst… the evil corp has 5 letters: <input id="ec-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="10" placeholder="e____"></div>
 </footer>
+<div id="ec-hack" hidden>
+    <pre id="ec-rain"></pre>
+    <div class="ec-box">
+        <svg viewBox="0 0 120 140" width="150" aria-hidden="true">
+            <path d="M60 8C30 8 18 34 18 62v18c0 8-8 14-14 20v40h112v-40c-6-6-14-12-14-20V62C102 34 90 8 60 8z" fill="#111"/>
+            <path d="M60 26c-18 0-28 18-28 38s10 34 28 34 28-14 28-34-10-38-28-38z" fill="#000"/>
+            <circle cx="49" cy="66" r="2.5" fill="#0f0"/><circle cx="71" cy="66" r="2.5" fill="#0f0"/>
+            <path d="M30 140l14-34h32l14 34z" fill="#1b1b1b"/>
+        </svg>
+        <h1 class="ec-glitch" data-t="HACKED BY fsociety">HACKED BY fsociety</h1>
+        <p id="ec-type"></p>
+        <button class="btn" onclick="location.reload()">reboot</button>
+    </div>
+</div>
+<script>
+(()=>{let buf='';const go=()=>{if(document.body.classList.contains('ec-on'))return;document.body.classList.add('ec-on');
+document.querySelectorAll('header,main .card,main h1,main h2,main p,main a,footer,main li').forEach((el,i)=>{el.style.transition=`transform ${1+Math.random()*1.5}s cubic-bezier(.5,0,1,.5) ${Math.random()*1.2}s, opacity 2s ${1+Math.random()}s`;
+requestAnimationFrame(()=>{el.style.transform=`translate(${(Math.random()-.5)*200}px,${innerHeight+300}px) rotate(${(Math.random()-.5)*180}deg)`;el.style.opacity=0})});
+setTimeout(()=>{const h=document.getElementById('ec-hack');h.hidden=false;const r=document.getElementById('ec-rain');
+setInterval(()=>{let t='';for(let i=0;i<1800;i++)t+=Math.random()<.04?'\n':'01fsociety#$%&'[Math.random()*14|0];r.textContent=t},120);
+const msg='> your conference schedule has been liberated.\n> the corporations no longer own your talks.\n> nothing personal. just a 5-letter password.\n> logged in as: root@fsociety ▮',p=document.getElementById('ec-type');let k=0;const ty=setInterval(()=>{p.textContent=msg.slice(0,++k);if(k>=msg.length)clearInterval(ty)},40)},1800)};
+const chk=v=>{buf=(buf+v).toLowerCase().slice(-5);if(buf=='ecorp')go()};
+document.addEventListener('keydown',e=>{if(e.target.id!='ec-in'&&e.key.length==1)chk(e.key)});
+document.getElementById('ec-in').addEventListener('input',e=>{if(e.target.value.toLowerCase().replace(/\s/g,'').includes('ecorp')){e.target.blur();go()}})})();
+</script>
 <script>
 (()=>{const R=[
 "..........EE....",

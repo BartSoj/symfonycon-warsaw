@@ -112,3 +112,18 @@ footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(-
 .pkp-title small { display: block; color: #9fb0d6; }
 .pkp-room { background: #ffd200; color: #0b1f4a; padding: 0 .4rem; border-radius: 4px; font-weight: 700; font-size: .85rem; }
 .pkp .muted { color: #9fb0d6; }
+
+/* fsociety easter egg */
+.ec-hint { margin-top: .8rem; font-size: .75rem; opacity: .35; font-family: ui-monospace, monospace; }
+.ec-hint input { width: 5.5em; background: transparent; border: 0; border-bottom: 1px dashed var(--muted); color: inherit; font: inherit; outline: none; }
+body.ec-on { overflow: hidden; animation: ec-shake .15s 8; }
+@keyframes ec-shake { 50% { transform: translate(4px,-3px) skewX(2deg); filter: hue-rotate(90deg) invert(.2); } }
+#ec-hack { position: fixed; inset: 0; z-index: 100; background: #000; color: #0f0; font-family: ui-monospace, monospace; display: flex; align-items: center; justify-content: center; animation: ec-in .6s; }
+#ec-hack[hidden] { display: none; }
+@keyframes ec-in { from { opacity: 0; } }
+#ec-rain { position: absolute; inset: 0; margin: 0; opacity: .18; overflow: hidden; white-space: pre-wrap; word-break: break-all; font-size: 12px; }
+.ec-box { position: relative; text-align: center; padding: 1rem; max-width: 30rem; }
+.ec-box p { white-space: pre-wrap; text-align: left; min-height: 6em; }
+.ec-box .btn { background: #0f0; color: #000; }
+.ec-glitch { position: relative; font-size: clamp(1.8rem, 9vw, 3rem); letter-spacing: .05em; text-shadow: 2px 0 #f00, -2px 0 #0ff; animation: ec-gl 1s infinite steps(2); }
+@keyframes ec-gl { 30% { transform: skewX(-12deg); clip-path: inset(10% 0 40% 0); } 60% { transform: translateX(-4px); clip-path: inset(50% 0 5% 0); } }

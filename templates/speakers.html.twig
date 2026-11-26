@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Speakers</h1>
-    <input type="search" id="speaker-search" class="speaker-search" placeholder="Search speakers…" autocomplete="off">
+    <input type="search" id="speaker-search" class="speaker-search" placeholder="Search speakers…" autocomplete="off" autofocus>
     <p class="muted" id="speaker-count">{{ speakers|length }} speakers</p>
 
     <div id="speaker-list">
@@ -23,6 +23,7 @@
         const input = document.getElementById('speaker-search');
         const cards = [...document.querySelectorAll('.speaker')];
         const list = document.getElementById('speaker-list');
+        input.focus();
         input.addEventListener('input', () => {
             const q = input.value.trim().toLowerCase();
             const hits = [], rest = [];

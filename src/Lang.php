@@ -21,6 +21,14 @@ class Lang
         'people so far' => 'ghot',
         'Add yours →' => 'DaH yIchel! →',
         'Language' => 'Hol',
+        'What should we build next?' => 'qaStaHvIS wa\' ram nuq wImutlh?',
+        'Shipped at the booth' => 'Daq ngevlu\'pu\'bogh',
+        'Just shipped' => 'DaH ngevlu\'pu\'',
+        'Up for grabs' => 'yIjon!',
+        'on TV' => 'HaSta jIHDaq',
+        'Thursday 26 November' => 'DaSjaj loS, jar wa\'maH wa\' 26',
+        'Friday 27 November' => 'DaSjaj vagh, jar wa\'maH wa\' 27',
+        'Saturday 28 November' => 'DaSjaj jav, jar wa\'maH wa\' 28',
     ];
 
     public function __construct(private RequestStack $requests)

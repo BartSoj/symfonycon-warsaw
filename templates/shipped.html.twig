@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Shipped · SymfonyCon Live{% endblock %}
+{% block title %}{{ 'Shipped'|t }} · SymfonyCon Live{% endblock %}
 
 {% block body %}
-    <h1>Shipped at the booth</h1>
+    <h1>{{ 'Shipped at the booth'|t }}</h1>
     <p class="muted">Every feature on this site was asked for by someone at SymfonyCon and built by an AI agent in PhpStorm.</p>
 
     {% for feature in shipped() %}

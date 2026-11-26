@@ -131,3 +131,18 @@ body.ec-on { overflow: hidden; animation: ec-shake .15s 8; }
 /* Rat eat toggle */
 .rat-toggle { background: none; border: 1px solid var(--muted); border-radius: 999px; padding: .1rem .5rem; cursor: pointer; opacity: .45; filter: grayscale(1); }
 .rat-toggle.on { opacity: 1; filter: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+
+/* Konami code */
+.kc-hint { margin-top: .4rem; font-size: .7rem; opacity: .3; font-family: ui-monospace, monospace; letter-spacing: .15em; }
+.kc-hint span { letter-spacing: 0; }
+body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
+@keyframes kc-rb { to { filter: hue-rotate(360deg); } }
+.kc-drop { position: fixed; top: -3rem; z-index: 120; pointer-events: none; animation: kc-fall linear forwards; }
+@keyframes kc-fall { to { transform: translateY(110vh) rotate(720deg); } }
+#kc { position: fixed; inset: 0; z-index: 110; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.6); }
+#kc[hidden] { display: none; }
+.kc-box { text-align: center; color: #fff; font-family: ui-monospace, monospace; padding: 1rem; }
+.kc-box h1 { font-size: clamp(2rem, 10vw, 3.5rem); margin: .2em 0; background: linear-gradient(90deg,#f00,#fa0,#ff0,#0f0,#0ff,#a0f,#f0f); -webkit-background-clip: text; background-clip: text; color: transparent; animation: kc-pulse .5s infinite alternate; }
+.kc-big { font-size: 6rem; animation: kc-bounce .6s infinite alternate; }
+@keyframes kc-bounce { to { transform: translateY(-20px) scale(1.1) rotate(10deg); } }
+@keyframes kc-pulse { to { transform: scale(1.06); } }

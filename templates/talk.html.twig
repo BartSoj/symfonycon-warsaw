@@ -18,9 +18,20 @@
                 <button type="submit" name="stars" value="{{ i }}" class="star{{ i <= myStars ? ' on' }}" aria-label="{{ i }} stars">★</button>
             {% endfor %}
         </form>
-        <p class="muted">
+        <p class="muted" id="rating-info">
             {% if avgStars %}{{ avgStars }} / 5 · {{ voteCount }} vote{{ voteCount > 1 ? 's' }}{% else %}Be the first to rate this talk{% endif %}
             {% if myStars %} · you gave {{ myStars }}★{% endif %}
         </p>
     </div>
+    <script>
+        document.querySelectorAll('.stars .star').forEach(btn => btn.addEventListener('click', async e => {
+            e.preventDefault();
+            const body = new FormData(); body.append('stars', btn.value);
+            const r = await (await fetch(location.href, {method: 'POST', body, headers: {'X-Requested-With': 'fetch'}})).json();
+            document.querySelectorAll('.stars .star').forEach(b => b.classList.toggle('on', +b.value <= r.mine));
+            document.getElementById('rating-info').textContent =
+                (r.avg ? `${r.avg} / 5 · ${r.count} vote${r.count > 1 ? 's' : ''}` : 'Be the first to rate this talk')
+                + (r.mine ? ` · you gave ${r.mine}★` : '');
+        }));
+    </script>
 {% endblock %}

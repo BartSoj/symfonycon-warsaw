@@ -38,6 +38,16 @@ class PageController extends AbstractController
             flock($fh, LOCK_UN);
             fclose($fh);
 
+            if ($request->headers->get('X-Requested-With') === 'fetch') {
+                $votes = $all[$talk->slug] ?? [];
+
+                return $this->json([
+                    'mine' => $votes[$attendee->id()] ?? 0,
+                    'avg' => $votes ? round(array_sum($votes) / count($votes), 1) : null,
+                    'count' => count($votes),
+                ]);
+            }
+
             return $this->redirectToRoute('talk', ['slug' => $talk->slug]);
         }
         flock($fh, LOCK_UN);

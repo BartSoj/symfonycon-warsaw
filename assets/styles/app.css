@@ -44,3 +44,38 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 @media (max-width: 700px) { .tv { grid-template-columns: 1fr; } }
 body:has(.tv) .wrap { max-width: 1500px; }
 body:has(.tv) { font-size: 20px; }
+
+/* PhpStorm New UI look */
+:root {
+    --bg: #f7f8fa; --fg: #1e1f22; --muted: #6c707e; --card: #fff; --line: #ebecf0;
+    --accent: #3574f0; --accent-fg: #fff; --ok: #208a3c;
+    --chrome: #f2f3f5; --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    --kw: #0033b3; --str: #067d17; --fn: #871094;
+}
+@media (prefers-color-scheme: dark) {
+    :root { --bg: #1e1f22; --fg: #dfe1e5; --muted: #868a91; --card: #2b2d30; --line: #393b40;
+        --accent: #3574f0; --accent-fg: #fff; --ok: #5fb865; --chrome: #2b2d30;
+        --kw: #cf8e6d; --str: #6aab73; --fn: #c77dbb; }
+    a { color: #548af7; }
+}
+body { font-family: Inter, "JetBrains Sans", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; }
+h1, h2 { font-weight: 600; letter-spacing: -.01em; }
+.top { background: var(--chrome); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+.brand::before { content: "PS"; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px;
+    font: 700 11px/1 var(--mono); color: #fff; background: linear-gradient(135deg, #b345f1 0%, #765af8 45%, #fd5f8e 100%); }
+.top nav { gap: 4px; }
+.top nav a { color: var(--fg); padding: 6px 10px; border-radius: 6px; font-size: .92rem; }
+.top nav a:hover { background: var(--line); }
+.card { border-radius: 8px; }
+a.card:hover { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.btn { border-radius: 6px; font-weight: 500; padding: .45rem 1rem; }
+.btn:hover { filter: brightness(1.1); }
+.btn-outline { color: var(--fg); border-color: var(--line); }
+.btn-outline:hover { background: var(--line); filter: none; }
+.tag { font: 500 .72rem/1.6 var(--mono); border-radius: 4px; color: var(--str); background: transparent; border: 1px solid var(--line); }
+.slot .time { font-family: var(--mono); font-weight: 500; color: var(--kw); }
+input, select, textarea { border-radius: 6px; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+code, pre { font-family: var(--mono); }
+footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(--line); background: var(--chrome); }

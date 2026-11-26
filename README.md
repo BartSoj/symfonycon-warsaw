@@ -3,6 +3,7 @@
 The SymfonyCon Warsaw 2026 companion app that attendees build at the JetBrains booth: they ask an AI
 agent in PhpStorm for a feature, and it goes live a few minutes later. Agents read `AGENTS.md`.
 
+- `BOOTH-SETUP.md`: steps for an agent preparing the booth laptop ("read BOOTH-SETUP.md and do it").
 - `bin/setup`: first run (composer install, database, talks).
 - `bin/ship "Title" "Name" [idea-id]`: check every page, record, commit, merge to main, deploy.
 - `bin/serve`: serve the main checkout on the internet without Upsun (prod mode, Cloudflare quick tunnel).

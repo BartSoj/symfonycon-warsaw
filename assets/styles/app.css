@@ -157,3 +157,12 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 .kc-ab { display: flex; gap: 1rem; justify-content: center; margin: 1rem 0; }
 .kc-ab button[data-k] { width: 3.8rem; height: 3.8rem; border-radius: 50% !important; background: #c0392b !important; font-weight: bold; }
 .kc-open { filter: none; opacity: 1; }
+
+#cc { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+.cc-box { background: var(--card); border-radius: 1.2rem; padding: 1.5rem; max-width: 26rem; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.cc-box svg { animation: cc-wobble 1.2s infinite alternate ease-in-out; }
+@keyframes cc-wobble { from { transform: rotate(-8deg); } to { transform: rotate(8deg) scale(1.05); } }
+.cc-small { font-size: .85rem; }
+.cc-btns { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+#cc-no { touch-action: none; }
+#cc-no.cc-run { position: fixed; z-index: 201; transition: left .15s ease-out, top .15s ease-out; }

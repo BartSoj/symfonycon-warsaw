@@ -109,5 +109,35 @@ if(nd&&nd.nodeType==3){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.lengt
 requestAnimationFrame(tick)}
 document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat);rat();setInterval(rat,10000);tick()})();
 </script>
+<div id="cc">
+    <div class="cc-box">
+        <svg viewBox="0 0 120 120" width="130" aria-hidden="true">
+            <circle cx="60" cy="60" r="56" fill="#d9a05b" stroke="#a8692c" stroke-width="4"/>
+            <circle cx="22" cy="40" r="5" fill="#4a2a12"/><circle cx="98" cy="38" r="4" fill="#4a2a12"/><circle cx="30" cy="92" r="5" fill="#4a2a12"/><circle cx="92" cy="88" r="4" fill="#4a2a12"/><circle cx="62" cy="14" r="4" fill="#4a2a12"/>
+            <path d="M28 42q14-12 30-2M64 38q16-10 30 4" stroke="#222" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M32 50q10-6 22 0q-10 6-22 0z" fill="#fff" stroke="#222" stroke-width="3"/><circle cx="48" cy="50" r="2.5" fill="#222"/>
+            <path d="M66 50q10-6 22 0q-10 6-22 0z" fill="#fff" stroke="#222" stroke-width="3"/><circle cx="82" cy="50" r="2.5" fill="#222"/>
+            <path d="M20 62q40 52 82-4q-6 2-12 2q-30 18-58 0q-6 2-12 2z" fill="#fff" stroke="#222" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M30 66l2 8M40 70l1 10M50 72v11M60 73v11M70 72v11M80 69l-1 10M90 64l-2 8" stroke="#222" stroke-width="2"/>
+            <path d="M24 60q-6-8 0-14M98 56q6-8 0-12" stroke="#222" stroke-width="2.5" fill="none"/>
+        </svg>
+        <h2>We use cookies 🍪</h2>
+        <p>This website uses cookies to improve your experience, track your every move, and generally be a menace. By staying alive, you agree.</p>
+        <p class="muted cc-small">Your choice will not be remembered. We'll ask again. Every. Single. Time.</p>
+        <div class="cc-btns">
+            <button class="btn" id="cc-yes">Accept all cookies</button>
+            <button class="btn btn-outline" id="cc-no">Disagree</button>
+        </div>
+    </div>
+</div>
+<script>
+(()=>{const o=document.getElementById('cc'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let n=0;
+document.getElementById('cc-yes').onclick=()=>o.remove();
+const run=()=>{const r=no.getBoundingClientRect();no.classList.add('cc-run');let x,y;do{x=Math.random()*(innerWidth-r.width-20)+10;y=Math.random()*(innerHeight-r.height-20)+10}while(Math.hypot(x-r.left,y-r.top)<150&&n++%50);
+no.style.left=x+'px';no.style.top=y+'px';no.textContent=T[Math.random()*T.length|0]};
+o.addEventListener('mousemove',e=>{const r=no.getBoundingClientRect();if(e.clientX>r.left-70&&e.clientX<r.right+70&&e.clientY>r.top-70&&e.clientY<r.bottom+70)run()});
+['pointerdown','touchstart','mouseenter','focus'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();run()}));
+no.addEventListener('click',e=>{e.preventDefault();run()})})();
+</script>
 </body>
 </html>

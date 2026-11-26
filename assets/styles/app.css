@@ -208,3 +208,8 @@ html.mode-day::after { content: ""; position: fixed; inset: 0; z-index: 40; poin
 #tpay-ball { position: fixed; left: 0; top: 0; z-index: 9999; font: bold 20px/1 "Courier New", monospace; color: #2bd96b;
     background: #000; padding: 6px 10px; border: 3px solid currentColor; text-decoration: none; letter-spacing: 1px;
     box-shadow: 0 0 12px currentColor; will-change: transform; }
+
+#ship{position:fixed;left:0;top:0;z-index:60;font-size:32px;width:40px;height:40px;line-height:40px;text-align:center;pointer-events:none;filter:drop-shadow(0 0 6px var(--accent))}
+.ship-laser{position:fixed;z-index:59;height:3px;background:linear-gradient(90deg,#0ff,#f0f);box-shadow:0 0 8px #0ff;transform-origin:0 50%;pointer-events:none}
+.ship-spark{position:fixed;z-index:61;pointer-events:none;font-size:18px;animation:ship-spark .7s ease-out forwards}
+@keyframes ship-spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}

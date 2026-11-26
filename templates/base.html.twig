@@ -177,5 +177,27 @@ box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.of
   requestAnimationFrame(step);
 })();
 </script>
+<div id="ship" aria-hidden="true">🚀</div>
+<script>
+(()=>{const S=document.getElementById('ship');let x=innerWidth/2,y=innerHeight-80,a=0,cool=0,tgt=null;const last=new WeakMap(),dead=new WeakSet();
+const movers=()=>{const out=[];document.querySelectorAll('body > *,.kc-drop').forEach(el=>{if(el==S||dead.has(el)||el.classList.contains('ship-fx')||el.hidden)return;
+const r=el.getBoundingClientRect();if(!r.width||r.width>300||r.height>300)return;const p=last.get(el);last.set(el,[r.left,r.top]);
+if(p&&Math.hypot(p[0]-r.left,p[1]-r.top)>0.5&&getComputedStyle(el).opacity>0.1)out.push(el)});return out};
+const boom=el=>{dead.add(el);const r=el.getBoundingClientRect();for(let i=0;i<14;i++){const f=document.createElement('div');f.className='ship-fx ship-spark';f.textContent=['💥','✨','🔥'][i%3];
+f.style.left=r.left+r.width/2+'px';f.style.top=r.top+r.height/2+'px';f.style.setProperty('--dx',(Math.random()-.5)*160+'px');f.style.setProperty('--dy',(Math.random()-.5)*160+'px');document.body.appendChild(f);setTimeout(()=>f.remove(),700)}
+el.style.transition='opacity .3s';el.style.opacity=0;el.style.pointerEvents='none';
+if(el.id=='tpay-ball')setTimeout(()=>{el.style.opacity=1;el.style.pointerEvents='';dead.delete(el)},8000);else setTimeout(()=>el.remove(),400)};
+const shoot=(el)=>{const r=el.getBoundingClientRect(),tx=r.left+r.width/2,ty=r.top+r.height/2,d=Math.hypot(tx-x,ty-y),l=document.createElement('div');l.className='ship-fx ship-laser';
+Object.assign(l.style,{left:x+'px',top:y+'px',width:d+'px',transform:`rotate(${Math.atan2(ty-y,tx-x)}rad)`});document.body.appendChild(l);setTimeout(()=>l.remove(),150);
+if(Math.random()<.5)boom(el)};
+let scan=[];setInterval(()=>{scan=movers()},300);
+const tick=()=>{if(!tgt||dead.has(tgt)||!tgt.isConnected){tgt=scan.filter(e=>!dead.has(e)&&e.isConnected).sort((p,q)=>{const a=p.getBoundingClientRect(),b=q.getBoundingClientRect();return Math.hypot(a.left-x,a.top-y)-Math.hypot(b.left-x,b.top-y)})[0]||null}
+let tx=innerWidth/2+Math.sin(Date.now()/1500)*innerWidth/3,ty=innerHeight-80;
+if(tgt){const r=tgt.getBoundingClientRect();tx=r.left+r.width/2;ty=r.top+r.height/2+110}
+const dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy);if(d>1){const v=Math.min(d,5);x+=dx/d*v;y+=dy/d*v}
+x=Math.max(20,Math.min(innerWidth-20,x));y=Math.max(20,Math.min(innerHeight-20,y));
+if(tgt){const r=tgt.getBoundingClientRect();a=Math.atan2(r.top+r.height/2-y,r.left+r.width/2-x);if(--cool<0&&Math.hypot(r.left-x,r.top-y)<350){cool=20;shoot(tgt)}}else a=-Math.PI/2;
+S.style.transform=`translate(${x-20}px,${y-20}px) rotate(${a+Math.PI/4}rad)`;requestAnimationFrame(tick)};tick()})();
+</script>
 </body>
 </html>

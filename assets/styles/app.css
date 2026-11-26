@@ -79,3 +79,9 @@ input, select, textarea { border-radius: 6px; }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
 code, pre { font-family: var(--mono); }
 footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(--line); background: var(--chrome); }
+
+/* Dark mode only */
+:root { color-scheme: dark; --bg: #1e1f22; --fg: #dfe1e5; --muted: #868a91; --card: #2b2d30; --line: #393b40;
+    --accent: #3574f0; --accent-fg: #fff; --ok: #5fb865; --chrome: #2b2d30;
+    --kw: #cf8e6d; --str: #6aab73; --fn: #c77dbb; }
+a { color: #548af7; }

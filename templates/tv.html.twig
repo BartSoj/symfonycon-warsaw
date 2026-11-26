@@ -8,6 +8,9 @@
         <div class="tv-qr">
             <img src="{{ qr }}" alt="QR code to {{ url }}">
             <p><b>Scan, then tell the agent what to build.</b><br><span class="muted">{{ url }}</span></p>
+            <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
+            <p style="font-size:1.5rem;margin:18px 0 0"><b>🎁 Get your Alt+Enter fidget toy here!</b></p>
+            <model-viewer src="/model.glb" alt="Alt+Enter fidget toy" camera-controls auto-rotate shadow-intensity="1" tone-mapping="neutral" camera-orbit="auto 70deg 80%" min-camera-orbit="auto auto 30%" style="width:100%;height:max(340px, calc(100vh - 730px))"></model-viewer>
         </div>
         <div>
             <p class="big"><b>{{ shipped()|length }}</b> features shipped by <b>{{ builders()|length }}</b> SymfonyCon attendees</p>

@@ -131,13 +131,17 @@ document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat)
     </div>
 </div>
 <script>
-(()=>{const o=document.getElementById('cc'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let n=0;
+(()=>{const o=document.getElementById('cc'),box=o.querySelector('.cc-box'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let last=0;
 document.getElementById('cc-yes').onclick=()=>o.remove();
-const run=()=>{const r=no.getBoundingClientRect();no.classList.add('cc-run');let x,y;do{x=Math.random()*(innerWidth-r.width-20)+10;y=Math.random()*(innerHeight-r.height-20)+10}while(Math.hypot(x-r.left,y-r.top)<150&&n++%50);
-no.style.left=x+'px';no.style.top=y+'px';no.textContent=T[Math.random()*T.length|0]};
-o.addEventListener('mousemove',e=>{const r=no.getBoundingClientRect();if(e.clientX>r.left-70&&e.clientX<r.right+70&&e.clientY>r.top-70&&e.clientY<r.bottom+70)run()});
-['pointerdown','touchstart','mouseenter','focus'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();run()}));
-no.addEventListener('click',e=>{e.preventDefault();run()})})();
+const place=(x,y)=>{no.style.left=x+'px';no.style.top=y+'px'};
+const yes=document.getElementById('cc-yes');place((box.clientWidth-no.offsetWidth)/2,yes.offsetTop+yes.offsetHeight+16);
+const run=(mx,my)=>{const now=Date.now();if(now-last<350)return;last=now;
+const W=box.clientWidth-no.offsetWidth-8,H=box.clientHeight-no.offsetHeight-8;let bx=8,by=8,bd=-1;
+for(let i=0;i<25;i++){const x=8+Math.random()*(W-8),y=8+Math.random()*(H-8),d=Math.hypot(x+no.offsetWidth/2-mx,y+no.offsetHeight/2-my);if(d>bd){bd=d;bx=x;by=y}}
+place(bx,by);no.textContent=T[Math.random()*T.length|0];no.style.background=`hsl(${Math.random()*360|0},85%,50%)`};
+const rel=e=>{const r=box.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top]};
+box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.offsetTop;if(mx>x-50&&mx<x+no.offsetWidth+50&&my>y-50&&my<y+no.offsetHeight+50)run(mx,my)});
+['pointerdown','touchstart','click'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();last=0;run(...rel(e))}))})();
 </script>
 </body>
 </html>

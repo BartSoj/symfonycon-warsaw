@@ -165,4 +165,5 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 .cc-small { font-size: .85rem; }
 .cc-btns { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
 #cc-no { touch-action: none; }
-#cc-no.cc-run { position: fixed; z-index: 201; transition: left .15s ease-out, top .15s ease-out; }
+.cc-box { position: relative; padding-bottom: 9rem; overflow: hidden; }
+#cc-no { position: absolute; width: 9.5rem; white-space: nowrap; overflow: hidden; background: hsl(0,85%,50%); color: #fff; border: 0; transition: left .2s ease-out, top .2s ease-out, background .2s; }

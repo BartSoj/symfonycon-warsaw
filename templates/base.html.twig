@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}SymfonyCon Live{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-    <script>(t=>t&&document.documentElement.classList.add(t))(localStorage.theme)</script>
+    <script>(t=>t&&document.documentElement.classList.add(t))(localStorage.theme);localStorage.mode&&document.documentElement.classList.add('mode-'+localStorage.mode)</script>
     {% block javascripts %}{{ importmap('app') }}{% endblock %}
 </head>
 <body>
@@ -29,8 +29,10 @@
                 </span>
             </span>
             <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
-            <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat)">🐀</button>
+            <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat);localStorage.ratEat&&ratBurst()">🐀</button>
             <button class="rat-toggle" id="snow-btn" title="Let it snow" onclick="snowToggle()">❄️</button>
+            <button class="rat-toggle on" id="mode-btn" title="Regular / Day / Night" onclick="localStorage.mode={'':'day',day:'night',night:''}[localStorage.mode||''];location.reload()">{{ '' }}🌗</button>
+            <script>document.getElementById('mode-btn').textContent={day:'☀️',night:'🌙'}[localStorage.mode]||'🌗'</script>
             <button class="rat-toggle" id="cc-btn" title="Annoying cookie banner on/off" onclick="localStorage.ccOff=localStorage.ccOff?'':'1';location.reload()">🍪</button>
         </nav>
     </div>
@@ -112,8 +114,14 @@ document.getElementById('ec-in').addEventListener('input',e=>{if(e.target.value.
 "...F.F....F.F..."],rats=[],h=()=>Math.random()*360|0;
 function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0;
 c.width=16;c.height=9;const x=c.getContext('2d'),col={B:`hsl(${hu},${Math.random()*60|0}%,${l}%)`,E:`hsl(${hu},40%,${Math.min(l+20,85)}%)`,P:`hsl(${330+Math.random()*30|0},80%,75%)`,k:['#000','#e00','#06f'][Math.random()*3|0],N:'#f6a',T:`hsl(${h()},70%,70%)`,F:'#f9c'},spot=`hsl(${h()},70%,50%)`,sp=Math.random()<.6;
-R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&sp&&Math.random()<.18?spot:col[ch];x.fillRect(i,y,1,1)}));
-Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});
+let kind='';if(localStorage.mode=='night'&&localStorage.ratEat&&Math.random()<.6){kind=['wolf','ghost','zombie'][Math.random()*3|0];
+if(kind=='wolf')Object.assign(col,{B:'#4a3423',E:'#2a1c12',P:'#6b4a33',k:'#ff0',N:'#111',T:'#2a1c12',F:'#ddd'});
+if(kind=='ghost')Object.assign(col,{B:'#f4f7ff',E:'#dfe6ff',P:'#cfd8ff',k:'#123',N:'#bcd',T:'#e6ecff',F:'#f4f7ff'});
+if(kind=='zombie')Object.assign(col,{B:'#6f8f3a',E:'#4f6b25',P:'#a33',k:'#f00',N:'#7a2',T:'#5a2',F:'#8b0000'})}
+R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&!kind&&sp&&Math.random()<.18?spot:ch=='B'&&kind=='zombie'&&Math.random()<.12?'#8b0000':ch=='B'&&kind=='wolf'&&Math.random()<.25?'#2a1c12':col[ch];x.fillRect(i,y,1,1)}));
+if(kind=='wolf'){x.fillStyle='#2a1c12';x.fillRect(10,0,1,2);x.fillRect(13,1,1,2);x.fillStyle='#fff';x.fillRect(14,5,1,1);x.fillRect(12,5,1,1)}
+if(kind)c.className='spooky-'+kind;
+Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});if(kind=='ghost')c.style.opacity=.55;
 c.vx=(Math.random()<.5?-1:1)*(1+Math.random()*3);c.side=Math.random()<.5;c.vy=(Math.random()-.5)*3;c.px=parseFloat(c.style.left);c.py=parseFloat(c.style.top);document.body.appendChild(c);rats.push(c);
 if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
 function tick(){const W=innerWidth,H=innerHeight;rats.forEach(c=>{const w=c.offsetWidth,hh=c.offsetHeight;
@@ -125,7 +133,7 @@ if((c.n=(c.n||0)+1)%6==0){const X=c.px+(c.vx>0?w:0),Y=c.py+hh/2;let nd,o;
 if(document.caretPositionFromPoint){const q=document.caretPositionFromPoint(X,Y);if(q){nd=q.offsetNode;o=q.offset}}else if(document.caretRangeFromPoint){const q=document.caretRangeFromPoint(X,Y);if(q){nd=q.startContainer;o=q.startOffset}}
 if(nd&&nd.nodeType==3){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.length&&t[i].trim()&&t[i]!=' '){nd.data=t.slice(0,i)+' '+t.slice(i+1);break}}}});
 requestAnimationFrame(tick)}
-document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat);rat();setInterval(rat,10000);tick()})();
+document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat);rat();if(localStorage.mode=='night'&&localStorage.ratEat)for(let i=0;i<5;i++)rat();window.ratBurst=()=>{for(let i=0;i<4;i++)rat()};setInterval(rat,10000);tick()})();
 </script>
 <div id="cc">
     <div class="cc-box">

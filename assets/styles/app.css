@@ -219,3 +219,16 @@ html.mode-day::after { content: ""; position: fixed; inset: 0; z-index: 40; poin
 .merch-item model-viewer { width: 100%; height: 300px; }
 .merch-item h2 { margin: 8px 0 4px; }
 .merch-item p { margin: 0; }
+
+/* Light mode: sunrise over a forest lake, bird-ships hunting bugs */
+#lake { display: none; }
+html.scene body { background: transparent !important; }
+html.scene { background: #ffd6a5; }
+html.scene #lake { display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+html.scene #lake svg, html.scene #lake canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+html.scene .card, html.scene .top { background: rgba(255,255,255,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+html.scene footer { background: rgba(255,255,255,.6); border-radius: 12px; }
+.lake-rays { transform-origin: 500px 395px; animation: lake-rays 40s linear infinite alternate; }
+@keyframes lake-rays { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+.lake-glint { animation: lake-glint 3s ease-in-out infinite alternate; }
+@keyframes lake-glint { from { opacity: .35; } to { opacity: .9; } }

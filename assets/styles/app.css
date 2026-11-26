@@ -232,3 +232,7 @@ html.scene footer { background: rgba(255,255,255,.6); border-radius: 12px; }
 @keyframes lake-rays { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
 .lake-glint { animation: lake-glint 3s ease-in-out infinite alternate; }
 @keyframes lake-glint { from { opacity: .35; } to { opacity: .9; } }
+/* Day mode = the lake scene, readable colours */
+html.scene.mode-day { --bg: #f7f8fa; --fg: #1e1f22; --muted: #5b5f6b; --card: #fff; --line: #ebecf0; --accent: #3574f0; --accent-fg: #fff; color-scheme: light; }
+html.scene.mode-day .top, html.scene.mode-day main, html.scene.mode-day footer { filter: none; }
+html.scene.mode-day::after { display: none; }

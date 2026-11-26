@@ -203,7 +203,7 @@ S.style.transform=`translate(${x-20}px,${y-20}px) rotate(${a+Math.PI/4}rad)`;req
 <div id="lake" aria-hidden="true"></div>
 <script>
 (()=>{const h=document.documentElement,L=document.getElementById('lake');
-const on=()=>!h.classList.contains('dark')&&!h.classList.contains('phpstorm')&&!h.classList.contains('mode-night')&&!h.classList.contains('mode-day')&&(h.classList.contains('light')||!matchMedia('(prefers-color-scheme: dark)').matches);
+const on=()=>!h.classList.contains('dark')&&!h.classList.contains('phpstorm')&&!h.classList.contains('mode-night')&&(h.classList.contains('mode-day')||h.classList.contains('light')||!matchMedia('(prefers-color-scheme: dark)').matches);
 let rays='';for(let i=0;i<14;i++){const a=(-170+i*12+Math.random()*4)*Math.PI/180,w=.025+Math.random()*.03,R=1400;
 rays+=`<polygon points="500,395 ${500+Math.cos(a-w)*R},${395+Math.sin(a-w)*R} ${500+Math.cos(a+w)*R},${395+Math.sin(a+w)*R}" fill="url(#ray)" opacity="${.25+Math.random()*.35}"/>`}
 const trees=(y,n,c,hmin,hmax)=>{let t='';for(let i=0;i<n;i++){const x=i*1000/n+Math.random()*12-6,hh=hmin+Math.random()*(hmax-hmin),w=hh*.32;

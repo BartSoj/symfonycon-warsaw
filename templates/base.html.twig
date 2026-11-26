@@ -31,5 +31,24 @@
     <a href="{{ path('shipped') }}">{{ shipped()|length }} {{ 'features by'|t }} {{ builders()|length }} {{ 'people so far'|t }}</a>.
     <a href="{{ path('ideas') }}">{{ 'Add yours →'|t }}</a>
 </footer>
+<script>
+(()=>{const R=[
+"..........EE....",
+".........EPPE...",
+".....BBBBBEEBB..",
+"...BBBBBBBBBBkB.",
+"..BBBBBBBBBBBBBN",
+"T.BBBBBBBBBBBBB.",
+".TBBBBBBBBBBBB..",
+"..TBBBBBBBBBB...",
+"...F.F....F.F..."],rats=[],h=()=>Math.random()*360|0;
+function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0,fl=Math.random()<.5;
+c.width=16;c.height=9;const x=c.getContext('2d'),col={B:`hsl(${hu},${Math.random()*60|0}%,${l}%)`,E:`hsl(${hu},40%,${Math.min(l+20,85)}%)`,P:`hsl(${330+Math.random()*30|0},80%,75%)`,k:['#000','#e00','#06f'][Math.random()*3|0],N:'#f6a',T:`hsl(${h()},70%,70%)`,F:'#f9c'},spot=`hsl(${h()},70%,50%)`,sp=Math.random()<.6;
+R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&sp&&Math.random()<.18?spot:col[ch];x.fillRect(fl?15-i:i,y,1,1)}));
+Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});
+document.body.appendChild(c);rats.push(c);
+if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
+rat();setInterval(rat,10000)})();
+</script>
 </body>
 </html>

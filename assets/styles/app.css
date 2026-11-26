@@ -189,11 +189,9 @@ body.kc-on main, body.kc-on header { animation: kc-rb 2s linear infinite; }
 @keyframes snowfall { to { transform: translate(var(--drift), 105vh) rotate(360deg); } }
 
 /* Regular / Day / Night mode */
-html.mode-night { --bg: #0b0f24; --fg: #e8e6f5; --muted: #8f8cb0; --card: rgba(22,24,48,.88); --line: #2b2d55; --accent: #c4b5fd; --accent-fg: #111; background: radial-gradient(ellipse at 80% 10%, #1d2350, #05060f 70%) fixed; }
-html.mode-night body { background: transparent; }
-html.mode-night::before { content: ""; position: fixed; top: 70px; right: 6vw; width: 140px; height: 140px; border-radius: 50%; z-index: -1; pointer-events: none;
-    background: radial-gradient(circle at 35% 35%, #fffbe6, #f2e6b0 55%, #d8c98a);
-    box-shadow: 0 0 60px 20px rgba(255,245,200,.35), 0 0 160px 60px rgba(200,200,255,.15), inset -18px -10px 0 rgba(0,0,0,.08); animation: moon-glow 5s ease-in-out infinite alternate; }
+html.mode-night { --bg: #0b0f24; --fg: #e8e6f5; --muted: #8f8cb0; --card: rgba(22,24,48,.88); --line: #2b2d55; --accent: #c4b5fd; --accent-fg: #111; background: #05040f; }
+html.mode-night body, html.mode-night.phpstorm body { background: transparent !important; }
+html.mode-night body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: #05040f url("/night.svg") center bottom / cover no-repeat; }
 html.mode-night::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
     background: radial-gradient(1px 1px at 10% 20%, #fff, transparent), radial-gradient(1px 1px at 30% 60%, #fff, transparent), radial-gradient(1.5px 1.5px at 55% 15%, #fff, transparent), radial-gradient(1px 1px at 70% 80%, #fff, transparent), radial-gradient(1px 1px at 90% 45%, #fff, transparent), radial-gradient(1.5px 1.5px at 20% 85%, #fff, transparent), radial-gradient(1px 1px at 45% 40%, #fff, transparent); }
 @keyframes moon-glow { to { box-shadow: 0 0 90px 30px rgba(255,245,200,.45), 0 0 200px 80px rgba(200,200,255,.2), inset -18px -10px 0 rgba(0,0,0,.08); } }

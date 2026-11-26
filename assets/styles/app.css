@@ -100,3 +100,15 @@ footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(-
 .speaker.hit .speaker-name { color: var(--accent); }
 .speaker.dim { opacity: .35; }
 .slot:target { box-shadow: 0 0 0 2px var(--accent); scroll-margin-top: 5rem; }
+
+/* PKP board */
+.pkp { background: #0b1f4a; color: #fff; border-radius: 12px; padding: 1rem; font-family: ui-monospace, monospace; }
+.pkp-clock { font-size: clamp(3rem, 18vw, 7rem); font-weight: 700; text-align: center; color: #ffd200; letter-spacing: .05em; line-height: 1; }
+.pkp-date { text-align: center; color: #cfd8ee; margin: .3rem 0 1rem; text-transform: capitalize; }
+.pkp .btn { display: block; margin: 0 auto 1rem; }
+.pkp-h { color: #ffd200; font-size: 1rem; border-bottom: 2px solid #ffd200; padding-bottom: .3rem; margin-top: 1.2rem; }
+.pkp-row { display: grid; grid-template-columns: 4rem 1fr auto; gap: .6rem; padding: .5rem 0; border-bottom: 1px solid #23396b; align-items: start; }
+.pkp-time { color: #ffd200; font-weight: 700; font-size: 1.1rem; }
+.pkp-title small { display: block; color: #9fb0d6; }
+.pkp-room { background: #ffd200; color: #0b1f4a; padding: 0 .4rem; border-radius: 4px; font-weight: 700; font-size: .85rem; }
+.pkp .muted { color: #9fb0d6; }

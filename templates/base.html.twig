@@ -15,6 +15,7 @@
         <nav>
             {# Add a link here for every new page #}
             <a href="{{ path('home') }}">{{ 'Schedule'|t }}</a>
+            <a href="{{ path('board') }}">🚉 {{ 'Board'|t }}</a>
             <a href="{{ path('speakers') }}">{{ 'Speakers'|t }}</a>
             <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
             <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
@@ -48,13 +49,13 @@ R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&
 Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});
 c.vx=(Math.random()<.5?-1:1)*(1+Math.random()*3);c.vy=(Math.random()-.5)*3;c.px=parseFloat(c.style.left);c.py=parseFloat(c.style.top);document.body.appendChild(c);rats.push(c);
 if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
-const no=new Set([document.documentElement,document.body]);
 function tick(){const W=innerWidth,H=innerHeight;rats.forEach(c=>{const w=c.offsetWidth,hh=c.offsetHeight;
 if(Math.random()<.02)c.vy=(Math.random()-.5)*3;c.px+=c.vx;c.py+=c.vy;
 if(c.px<0||c.px>W-w){c.vx*=-1;c.px=Math.max(0,Math.min(W-w,c.px))}if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}
 c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=c.vx<0?'scaleX(-1)':'';
-const e=document.elementFromPoint(c.px+(c.vx>0?w:0),c.py+hh/2);
-if(e&&!no.has(e)&&e.tagName!='CANVAS'&&e.offsetWidth*e.offsetHeight<W*H/6){e.style.transition='opacity .3s,transform .3s';e.style.opacity=0;e.style.transform='scale(.3)';e.style.pointerEvents='none';no.add(e)}});
+if((c.n=(c.n||0)+1)%6==0){const X=c.px+(c.vx>0?w:0),Y=c.py+hh/2;let nd,o;
+if(document.caretPositionFromPoint){const q=document.caretPositionFromPoint(X,Y);if(q){nd=q.offsetNode;o=q.offset}}else if(document.caretRangeFromPoint){const q=document.caretRangeFromPoint(X,Y);if(q){nd=q.startContainer;o=q.startOffset}}
+if(nd&&nd.nodeType==3){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.length&&t[i].trim()&&t[i]!=' '){nd.data=t.slice(0,i)+' '+t.slice(i+1);break}}}});
 requestAnimationFrame(tick)}
 rat();setInterval(rat,10000);tick()})();
 </script>

@@ -39,6 +39,17 @@ class PageController extends AbstractController
         return $this->render('speakers.html.twig', ['speakers' => $bySpeaker]);
     }
 
+    #[Route('/board', name: 'board')]
+    public function board(TalkRepository $talks): Response
+    {
+        $list = array_map(fn (Talk $t) => [
+            'title' => $t->title, 'speakers' => implode(', ', $t->speakers), 'room' => $t->room,
+            'start' => $t->startsAt->format(DATE_ATOM), 'end' => $t->endsAt->format(DATE_ATOM),
+        ], $talks->findBy([], ['startsAt' => 'ASC', 'room' => 'ASC']));
+
+        return $this->render('board.html.twig', ['talks' => $list]);
+    }
+
     #[Route('/ideas', name: 'ideas')]
     public function ideas(): Response
     {

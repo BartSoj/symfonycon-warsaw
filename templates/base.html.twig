@@ -131,7 +131,7 @@ if(c.px<0||c.px>W-w){c.vx*=-1;c.px=Math.max(0,Math.min(W-w,c.px))}if(c.py<0||c.p
 c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=c.vx<0?'scaleX(-1)':'';
 if((c.n=(c.n||0)+1)%6==0){const X=c.px+(c.vx>0?w:0),Y=c.py+hh/2;let nd,o;
 if(document.caretPositionFromPoint){const q=document.caretPositionFromPoint(X,Y);if(q){nd=q.offsetNode;o=q.offset}}else if(document.caretRangeFromPoint){const q=document.caretRangeFromPoint(X,Y);if(q){nd=q.startContainer;o=q.startOffset}}
-if(nd&&nd.nodeType==3){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.length&&t[i].trim()&&t[i]!=' '){nd.data=t.slice(0,i)+' '+t.slice(i+1);break}}}});
+if(nd&&nd.nodeType==3&&!nd.parentElement?.closest('header,.top,nav,button,#cc')){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.length&&t[i].trim()&&!/[\ud800-\udfff\ufe0f\u200d]/.test(t[i])&&t[i]!=' '){nd.data=t.slice(0,i)+' '+t.slice(i+1);break}}}});
 requestAnimationFrame(tick)}
 document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat);rat();if(localStorage.mode=='night'&&localStorage.ratEat)for(let i=0;i<5;i++)rat();window.ratBurst=()=>{for(let i=0;i<4;i++)rat()};setInterval(rat,10000);tick()})();
 </script>

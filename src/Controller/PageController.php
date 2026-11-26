@@ -59,4 +59,13 @@ class PageController extends AbstractController
 
         return $this->render('tv.html.twig', ['url' => $url, 'qr' => (new QRCode())->render($url)]);
     }
+
+    #[Route('/lang/{code}', name: 'lang', defaults: ['code' => 'en'])]
+    public function lang(string $code, \Symfony\Component\HttpFoundation\Request $request): Response
+    {
+        $response = $this->redirect($request->headers->get('referer') ?: $this->generateUrl('home'));
+        $response->headers->setCookie(\Symfony\Component\HttpFoundation\Cookie::create('lang', $code === 'tlh' ? 'tlh' : 'en', strtotime('+1 year')));
+
+        return $response;
+    }
 }

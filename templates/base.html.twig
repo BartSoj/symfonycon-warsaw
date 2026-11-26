@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,10 +13,11 @@
         <a class="brand" href="{{ path('home') }}">⚡ SymfonyCon <b>Live</b></a>
         <nav>
             {# Add a link here for every new page #}
-            <a href="{{ path('home') }}">Schedule</a>
-            <a href="{{ path('speakers') }}">Speakers</a>
-            <a href="{{ path('ideas') }}">Ideas</a>
-            <a href="{{ path('shipped') }}">Shipped</a>
+            <a href="{{ path('home') }}">{{ 'Schedule'|t }}</a>
+            <a href="{{ path('speakers') }}">{{ 'Speakers'|t }}</a>
+            <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
+            <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
+            <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
         </nav>
     </div>
 </header>
@@ -24,9 +25,9 @@
     {% block body %}{% endblock %}
 </main>
 <footer class="wrap muted">
-    Built live by SymfonyCon attendees with AI agents in PhpStorm, at the JetBrains booth.
-    <a href="{{ path('shipped') }}">{{ shipped()|length }} features by {{ builders()|length }} people so far</a>.
-    <a href="{{ path('ideas') }}">Add yours →</a>
+    {{ 'Built live by SymfonyCon attendees with AI agents in PhpStorm, at the JetBrains booth.'|t }}
+    <a href="{{ path('shipped') }}">{{ shipped()|length }} {{ 'features by'|t }} {{ builders()|length }} {{ 'people so far'|t }}</a>.
+    <a href="{{ path('ideas') }}">{{ 'Add yours →'|t }}</a>
 </footer>
 </body>
 </html>

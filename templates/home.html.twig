@@ -2,7 +2,7 @@
 
 {% block body %}
     <h1>SymfonyCon Warsaw 2026</h1>
-    <p class="muted">26–27 November · Hilton Warsaw City · times are Warsaw time</p>
+    <p class="muted">{{ '26–27 November'|t }} · Hilton Warsaw City · {{ 'times are Warsaw time'|t }}</p>
 
     {% for day, talks in days %}
         <h2>{{ day }}</h2>

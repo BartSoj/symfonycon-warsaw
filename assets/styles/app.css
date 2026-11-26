@@ -80,11 +80,17 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 code, pre { font-family: var(--mono); }
 footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(--line); background: var(--chrome); }
 
-/* Dark mode only */
-:root { color-scheme: dark; --bg: #1e1f22; --fg: #dfe1e5; --muted: #868a91; --card: #2b2d30; --line: #393b40;
+/* Theme toggle: auto by system, overridden by html.light / html.dark */
+:root.light { color-scheme: light; --bg: #f7f8fa; --fg: #1e1f22; --muted: #6c707e; --card: #fff; --line: #ebecf0;
+    --accent: #3574f0; --accent-fg: #fff; --ok: #208a3c; --chrome: #f2f3f5;
+    --kw: #0033b3; --str: #067d17; --fn: #871094; }
+:root.dark { color-scheme: dark; --bg: #1e1f22; --fg: #dfe1e5; --muted: #868a91; --card: #2b2d30; --line: #393b40;
     --accent: #3574f0; --accent-fg: #fff; --ok: #5fb865; --chrome: #2b2d30;
     --kw: #cf8e6d; --str: #6aab73; --fn: #c77dbb; }
-a { color: #548af7; }
+.theme-toggle { background: none; border: 0; cursor: pointer; font-size: 1.3rem; padding: 4px 8px; margin-left: auto; filter: grayscale(1) brightness(.35); }
+.theme-toggle:hover { background: var(--line); border-radius: 6px; }
+:root.dark .theme-toggle { filter: grayscale(1) brightness(3); }
+@media (prefers-color-scheme: dark) { :root:not(.light) .theme-toggle { filter: grayscale(1) brightness(3); } }
 
 /* Speakers page */
 .speaker-search { width: 100%; box-sizing: border-box; padding: .7rem 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid var(--muted); background: var(--card); color: inherit; position: sticky; top: .5rem; z-index: 5; }

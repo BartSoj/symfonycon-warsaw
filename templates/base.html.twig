@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}SymfonyCon Live{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <script>(t=>t&&document.documentElement.classList.add(t))(localStorage.theme)</script>
     {% block javascripts %}{{ importmap('app') }}{% endblock %}
 </head>
 <body>
@@ -18,6 +19,7 @@
             <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
             <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
             <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
+            <button class="theme-toggle" title="Light / dark" onclick="var h=document.documentElement,d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme: dark)').matches),t=d?'light':'dark';h.classList.remove('light','dark');h.classList.add(t);localStorage.theme=t">🐘</button>
         </nav>
     </div>
 </header>

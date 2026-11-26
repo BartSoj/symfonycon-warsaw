@@ -31,6 +31,7 @@
             <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
             <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat)">🐀</button>
             <button class="rat-toggle" id="snow-btn" title="Let it snow" onclick="snowToggle()">❄️</button>
+            <button class="rat-toggle" id="cc-btn" title="Annoying cookie banner on/off" onclick="localStorage.ccOff=localStorage.ccOff?'':'1';location.reload()">🍪</button>
         </nav>
     </div>
 </header>
@@ -148,7 +149,7 @@ document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat)
     </div>
 </div>
 <script>
-(()=>{const o=document.getElementById('cc'),box=o.querySelector('.cc-box'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let last=0;
+(()=>{document.getElementById('cc-btn')?.classList.toggle('on',!localStorage.ccOff);if(localStorage.ccOff){document.getElementById('cc').remove();return}const o=document.getElementById('cc'),box=o.querySelector('.cc-box'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let last=0;
 document.getElementById('cc-yes').onclick=()=>o.remove();
 const place=(x,y)=>{no.style.left=x+'px';no.style.top=y+'px'};
 const yes=document.getElementById('cc-yes');place((box.clientWidth-no.offsetWidth)/2,yes.offsetTop+yes.offsetHeight+16);

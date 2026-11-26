@@ -85,3 +85,12 @@ footer { font-family: var(--mono); font-size: .8rem; border-top: 1px solid var(-
     --accent: #3574f0; --accent-fg: #fff; --ok: #5fb865; --chrome: #2b2d30;
     --kw: #cf8e6d; --str: #6aab73; --fn: #c77dbb; }
 a { color: #548af7; }
+
+/* Speakers page */
+.speaker-search { width: 100%; box-sizing: border-box; padding: .7rem 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid var(--muted); background: var(--card); color: inherit; position: sticky; top: .5rem; z-index: 5; }
+.speaker { display: block; transition: opacity .15s, box-shadow .15s; }
+.speaker .speaker-name { display: block; margin-bottom: .3rem; }
+.speaker.hit { box-shadow: 0 0 0 2px var(--accent); }
+.speaker.hit .speaker-name { color: var(--accent); }
+.speaker.dim { opacity: .35; }
+.slot:target { box-shadow: 0 0 0 2px var(--accent); scroll-margin-top: 5rem; }

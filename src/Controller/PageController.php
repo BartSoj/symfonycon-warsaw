@@ -25,6 +25,20 @@ class PageController extends AbstractController
         return $this->render('talk.html.twig', ['talk' => $talk]);
     }
 
+    #[Route('/speakers', name: 'speakers')]
+    public function speakers(TalkRepository $talks): Response
+    {
+        $bySpeaker = [];
+        foreach ($talks->findAll() as $talk) {
+            foreach ($talk->speakers as $speaker) {
+                $bySpeaker[$speaker][] = $talk;
+            }
+        }
+        ksort($bySpeaker, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $this->render('speakers.html.twig', ['speakers' => $bySpeaker]);
+    }
+
     #[Route('/ideas', name: 'ideas')]
     public function ideas(): Response
     {

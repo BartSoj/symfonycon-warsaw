@@ -8,7 +8,7 @@
         <h2>{{ day }}</h2>
         {% for talk in talks %}
             {% if talk.isSession %}
-                <a class="card slot" href="{{ path('talk', {slug: talk.slug}) }}">
+                <a class="card slot" id="{{ talk.slug }}" href="{{ path('talk', {slug: talk.slug}) }}">
                     <span class="time">{{ talk.startsAt|date('H:i') }}</span>
                     <span>
                         <b>{{ talk.title }}</b><br>

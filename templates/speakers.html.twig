@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Speakers · SymfonyCon Live{% endblock %}
+
+{% block body %}
+    <h1>Speakers</h1>
+    <input type="search" id="speaker-search" class="speaker-search" placeholder="Search speakers…" autocomplete="off">
+    <p class="muted" id="speaker-count">{{ speakers|length }} speakers</p>
+
+    {% for speaker, talks in speakers %}
+        <div class="card speaker" data-name="{{ speaker|lower }}">
+            <b class="speaker-name">{{ speaker }}</b>
+            {% for talk in talks %}
+                <div><a href="{{ path('home') }}#{{ talk.slug }}">{{ talk.title }}</a>
+                    <span class="muted">· {{ talk.startsAt|date('D H:i') }}{% if talk.room %} · {{ talk.room }}{% endif %}</span></div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <script>
+        const input = document.getElementById('speaker-search');
+        const cards = document.querySelectorAll('.speaker');
+        input.addEventListener('input', () => {
+            const q = input.value.trim().toLowerCase();
+            let hits = 0, first = null;
+            cards.forEach(c => {
+                const match = q !== '' && c.dataset.name.includes(q);
+                c.classList.toggle('hit', match);
+                c.classList.toggle('dim', q !== '' && !match);
+                if (match) { hits++; first ??= c; }
+            });
+            document.getElementById('speaker-count').textContent = q ? hits + ' matching' : cards.length + ' speakers';
+            first?.scrollIntoView({behavior: 'smooth', block: 'center'});
+        });
+    </script>
+{% endblock %}

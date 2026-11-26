@@ -127,3 +127,7 @@ body.ec-on { overflow: hidden; animation: ec-shake .15s 8; }
 .ec-box .btn { background: #0f0; color: #000; }
 .ec-glitch { position: relative; font-size: clamp(1.8rem, 9vw, 3rem); letter-spacing: .05em; text-shadow: 2px 0 #f00, -2px 0 #0ff; animation: ec-gl 1s infinite steps(2); }
 @keyframes ec-gl { 30% { transform: skewX(-12deg); clip-path: inset(10% 0 40% 0); } 60% { transform: translateX(-4px); clip-path: inset(50% 0 5% 0); } }
+
+/* Rat eat toggle */
+.rat-toggle { background: none; border: 1px solid var(--muted); border-radius: 999px; padding: .1rem .5rem; cursor: pointer; opacity: .45; filter: grayscale(1); }
+.rat-toggle.on { opacity: 1; filter: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }

@@ -19,7 +19,7 @@
             <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
             <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
             <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
-            <button class="theme-toggle" title="Light / dark" onclick="var h=document.documentElement,d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme: dark)').matches),t=d?'light':'dark';h.classList.remove('light','dark');h.classList.add(t);localStorage.theme=t">🐘</button>
+            <button class="theme-toggle" title="Light / dark" onclick="var h=document.documentElement,d=h.classList.contains('dark')||(!h.classList.contains('light')&&matchMedia('(prefers-color-scheme: dark)').matches),t=d?'light':'dark';h.classList.remove('light','dark');h.classList.add(t);localStorage.theme=t"><span>🐘</span></button>
         </nav>
     </div>
 </header>

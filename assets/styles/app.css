@@ -205,3 +205,6 @@ html.mode-day .top, html.mode-day main, html.mode-day footer { filter: brightnes
 html.mode-day::after { content: ""; position: fixed; inset: 0; z-index: 40; pointer-events: none;
     background: radial-gradient(circle at 85% 5%, rgba(255,255,255,.95), rgba(255,250,210,.55) 35%, rgba(255,255,255,.3) 70%); animation: glare 3s ease-in-out infinite alternate; }
 @keyframes glare { to { opacity: .7; } }
+#tpay-ball { position: fixed; left: 0; top: 0; z-index: 9999; font: bold 20px/1 "Courier New", monospace; color: #2bd96b;
+    background: #000; padding: 6px 10px; border: 3px solid currentColor; text-decoration: none; letter-spacing: 1px;
+    box-shadow: 0 0 12px currentColor; will-change: transform; }

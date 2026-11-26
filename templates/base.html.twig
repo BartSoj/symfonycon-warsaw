@@ -161,5 +161,21 @@ const rel=e=>{const r=box.getBoundingClientRect(),p=e.touches?e.touches[0]:e;ret
 box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.offsetTop;if(mx>x-50&&mx<x+no.offsetWidth+50&&my>y-50&&my<y+no.offsetHeight+50)run(mx,my)});
 ['pointerdown','touchstart','click'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();last=0;run(...rel(e))}))})();
 </script>
+<a id="tpay-ball" href="https://tpay.com" target="_blank" rel="noopener">tpay.com</a>
+<script>
+(() => {
+  const b = document.getElementById('tpay-ball'); if (!b) return;
+  let x = Math.random() * (innerWidth - 120), y = Math.random() * (innerHeight - 40), dx = 2.2, dy = 1.8;
+  const step = () => {
+    const w = b.offsetWidth, h = b.offsetHeight;
+    x += dx; y += dy;
+    if (x <= 0 || x + w >= innerWidth) { dx = -dx; x = Math.max(0, Math.min(x, innerWidth - w)); b.style.color = `hsl(${Math.random()*360},90%,60%)`; }
+    if (y <= 0 || y + h >= innerHeight) { dy = -dy; y = Math.max(0, Math.min(y, innerHeight - h)); b.style.color = `hsl(${Math.random()*360},90%,60%)`; }
+    b.style.transform = `translate(${x}px, ${y}px)`;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+})();
+</script>
 </body>
 </html>

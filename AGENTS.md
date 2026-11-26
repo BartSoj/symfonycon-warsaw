@@ -27,7 +27,6 @@ The command takes care of everything:
 
 - it renders every page and stops on an error;
 - it adds the feature to `/shipped`;
-- it commits, merges into `main` and deploys.
 
 Pass the `idea-id` when the visitor picked one from `data/ideas.yaml`. If the command fails, fix
 the error it prints and run it again. If it reports a rebase conflict, keep both sides and follow

@@ -29,8 +29,6 @@
                 </span>
             </span>
             <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
-            <button class="rat-toggle" id="rat-eat" title="Rats eat the page" onclick="localStorage.ratEat=localStorage.ratEat?'':'1';this.classList.toggle('on',!!localStorage.ratEat);localStorage.ratEat&&ratBurst()">🐀</button>
-            <button class="rat-toggle" id="snow-btn" title="Let it snow" onclick="snowToggle()">❄️</button>
             <button class="rat-toggle on" id="mode-btn" title="Regular / Day / Night" onclick="localStorage.mode={'':'day',day:'night',night:''}[localStorage.mode||''];location.reload()">{{ '' }}🌗</button>
             <script>document.getElementById('mode-btn').textContent={day:'☀️',night:'🌙'}[localStorage.mode]||'🌗'</script>
             <button class="rat-toggle" id="cc-btn" title="Annoying cookie banner on/off" onclick="localStorage.ccOff=localStorage.ccOff?'':'1';location.reload()">🍪</button>
@@ -114,7 +112,7 @@ document.getElementById('ec-in').addEventListener('input',e=>{if(e.target.value.
 "...F.F....F.F..."],rats=[],h=()=>Math.random()*360|0;
 function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0;
 c.width=16;c.height=9;const x=c.getContext('2d'),col={B:`hsl(${hu},${Math.random()*60|0}%,${l}%)`,E:`hsl(${hu},40%,${Math.min(l+20,85)}%)`,P:`hsl(${330+Math.random()*30|0},80%,75%)`,k:['#000','#e00','#06f'][Math.random()*3|0],N:'#f6a',T:`hsl(${h()},70%,70%)`,F:'#f9c'},spot=`hsl(${h()},70%,50%)`,sp=Math.random()<.6;
-let kind='';if(localStorage.mode=='night'&&localStorage.ratEat&&Math.random()<.6){kind=['wolf','ghost','zombie'][Math.random()*3|0];
+let kind='';if(false){kind=['wolf','ghost','zombie'][Math.random()*3|0];
 if(kind=='wolf')Object.assign(col,{B:'#4a3423',E:'#2a1c12',P:'#6b4a33',k:'#ff0',N:'#111',T:'#2a1c12',F:'#ddd'});
 if(kind=='ghost')Object.assign(col,{B:'#f4f7ff',E:'#dfe6ff',P:'#cfd8ff',k:'#123',N:'#bcd',T:'#e6ecff',F:'#f4f7ff'});
 if(kind=='zombie')Object.assign(col,{B:'#6f8f3a',E:'#4f6b25',P:'#a33',k:'#f00',N:'#7a2',T:'#5a2',F:'#8b0000'})}
@@ -125,15 +123,9 @@ Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRend
 c.vx=(Math.random()<.5?-1:1)*(1+Math.random()*3);c.side=Math.random()<.5;c.vy=(Math.random()-.5)*3;c.px=parseFloat(c.style.left);c.py=parseFloat(c.style.top);document.body.appendChild(c);rats.push(c);
 if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
 function tick(){const W=innerWidth,H=innerHeight;rats.forEach(c=>{const w=c.offsetWidth,hh=c.offsetHeight;
-if(!localStorage.ratEat){if(Math.abs(c.vy)<1)c.vy=(c.vy<0?-1:1)*(1+Math.random()*2);c.px=c.side?W-w:0;c.py+=c.vy;if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=`rotate(${c.vy>0?90:-90}deg)`;return}
-if(Math.random()<.02)c.vy=(Math.random()-.5)*3;c.px+=c.vx;c.py+=c.vy;
-if(c.px<0||c.px>W-w){c.vx*=-1;c.px=Math.max(0,Math.min(W-w,c.px))}if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}
-c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=c.vx<0?'scaleX(-1)':'';
-if((c.n=(c.n||0)+1)%6==0){const X=c.px+(c.vx>0?w:0),Y=c.py+hh/2;let nd,o;
-if(document.caretPositionFromPoint){const q=document.caretPositionFromPoint(X,Y);if(q){nd=q.offsetNode;o=q.offset}}else if(document.caretRangeFromPoint){const q=document.caretRangeFromPoint(X,Y);if(q){nd=q.startContainer;o=q.startOffset}}
-if(nd&&nd.nodeType==3&&!nd.parentElement?.closest('header,.top,nav,button,#cc')){const t=nd.data;for(const i of [o,o-1])if(i>=0&&i<t.length&&t[i].trim()&&!/[\ud800-\udfff\ufe0f\u200d]/.test(t[i])&&t[i]!=' '){nd.data=t.slice(0,i)+' '+t.slice(i+1);break}}}});
+if(Math.abs(c.vy)<1)c.vy=(c.vy<0?-1:1)*(1+Math.random()*2);c.px=c.side?W-w:0;c.py+=c.vy;if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=`rotate(${c.vy>0?90:-90}deg)`});
 requestAnimationFrame(tick)}
-document.getElementById('rat-eat')?.classList.toggle('on',!!localStorage.ratEat);rat();if(localStorage.mode=='night'&&localStorage.ratEat)for(let i=0;i<5;i++)rat();window.ratBurst=()=>{for(let i=0;i<4;i++)rat()};setInterval(rat,10000);tick()})();
+rat();setInterval(rat,10000);tick()})();
 </script>
 <div id="cc">
     <div class="cc-box">
@@ -168,14 +160,6 @@ place(bx,by);no.textContent=T[Math.random()*T.length|0];no.style.background=`hsl
 const rel=e=>{const r=box.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top]};
 box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.offsetTop;if(mx>x-50&&mx<x+no.offsetWidth+50&&my>y-50&&my<y+no.offsetHeight+50)run(mx,my)});
 ['pointerdown','touchstart','click'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();last=0;run(...rel(e))}))})();
-</script>
-<script>
-(()=>{let iv=null;const box=document.createElement('div');box.className='snow-box';document.body.appendChild(box);
-function flake(){const f=document.createElement('span');f.className='snowflake';f.textContent=Math.random()<.5?'❄':'•';
-f.style.left=Math.random()*100+'vw';f.style.fontSize=.5+Math.random()*1.2+'rem';f.style.opacity=.5+Math.random()*.5;
-const d=5+Math.random()*7;f.style.animationDuration=d+'s';f.style.setProperty('--drift',(Math.random()*120-60)+'px');box.appendChild(f);setTimeout(()=>f.remove(),d*1000)}
-function set(on){document.getElementById('snow-btn')?.classList.toggle('on',on);clearInterval(iv);iv=null;if(on)iv=setInterval(flake,150);else box.innerHTML=''}
-window.snowToggle=()=>{localStorage.snow=localStorage.snow?'':'1';set(!!localStorage.snow)};set(!!localStorage.snow)})();
 </script>
 </body>
 </html>

@@ -27,22 +27,15 @@ class CheckCommand
         foreach ($this->bots->keys() as $key) {
             $info = $this->bots->info($key);
             $problems = array_filter([$info['problem']]);
-            $wins = 0;
-            $survived = 0;
             foreach ([...League::TRIAL_SEEDS, 1, 2] as $i => $seed) {
                 $replay = $this->referee->play($key, $i < 3 ? League::HOUSE : 'RookieBot', $seed);
                 $crash = $replay['players'][0]['crash'];
                 if ($crash['error'] ?? false) {
                     $problems[] = "seed $seed, tick {$crash['tick']}: {$crash['reason']}";
                 }
-                $wins += $i < 3 && 0 === $replay['winner'] ? 1 : 0;
-                $survived = max($survived, $i < 3 ? League::survived($replay, 0) : 0);
             }
-            $verdict = $info['house'] ? '' : " · beats The House $wins/3, survives up to $survived ticks: ".match (true) {
-                $wins >= 2 => '🏆',
-                default => 'not yet (it needs 2 wins)',
-            };
-            $io->writeln(\sprintf('%s bot %s "%s" by %s%s', $problems ? '<error>FAIL</error>' : '<info>ok</info>', $key, $info['name'], $info['author'], $verdict));
+            // No wins or losses here on purpose: visitors see the results first on the TV.
+            $io->writeln(\sprintf('%s bot %s "%s" by %s', $problems ? '<error>FAIL</error>' : '<info>ok</info>', $key, $info['name'], $info['author']));
             foreach (array_unique($problems) as $problem) {
                 $io->writeln("     $problem");
             }

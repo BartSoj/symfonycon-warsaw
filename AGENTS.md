@@ -24,7 +24,8 @@ The size (28–44 × 18–26) and the walls change from match to match, so never
 - Create **exactly one file**: `src/Bot/<Name>Bot.php`, with the class named after the visitor or the bot
   (for example `src/Bot/AnnaViperBot.php`). If the file already exists and isn't theirs, pick another name.
   When they come back to improve their bot, edit only their own file.
-- Don't write tests. `bin/ship` plays your bot against The House and Rookie and prints the result.
+- Don't write tests, and don't run matches to see how the bot does: the visitor sees the results for the
+  first time on the TV. `bin/ship` only checks that the bot doesn't crash with an error.
 - When it's ready, ship it (see "Ship it" below).
 
 ## Writing the bot
@@ -84,16 +85,15 @@ Rules the arena enforces:
 bin/ship "Bot name" "Visitor's first name or handle" [idea-id]
 ```
 
-It plays your bot a few times, renders every page, adds it to the arena and deploys it. It prints a line like
-`ok bot AnnaViperBot "Viper" by Anna · beats The House 2/3, survives up to 274 ticks: 🏆`.
-If it prints FAIL, fix the error it shows and run it again. Ship the visitor's idea as they described it, even
-if it wins nothing: they can come back and improve it. If it reports a rebase conflict, keep both sides and follow its
+It plays your bot a few times in the background to catch errors, renders every page, and deploys it. It
+prints `ok bot AnnaViperBot "Viper" by Anna` and no results, on purpose. If it prints FAIL, fix the error it
+shows and run it again. Ship the visitor's idea as they described it: they can come back and improve it. If it reports a rebase conflict, keep both sides and follow its
 instructions.
 
-When it's done, tell the visitor in one sentence how it did against The House, that its trial plays on the TV now, and that
-their bot's page is on their phone: from the home page, tap it under "In the garage" (`/bot/<ClassName>`).
-New bots only play The House. On that page they can run test matches and tap "Enter the arena" to race
-everyone else's bots.
+When it's done, tell the visitor in one sentence to watch the TV: their 3 trial matches against The House
+play there next. Don't guess or reveal how it will do. Afterwards, their bot's page is on their phone: from
+the home page, tap it under "In the garage" (`/bot/<ClassName>`). New bots only play The House. On that page
+they can run test matches and tap "Enter the arena" to race everyone else's bots.
 
 ## The app (you shouldn't need to touch it)
 
@@ -109,9 +109,8 @@ If something unrelated to the bot is broken, tell the booth staff instead of fix
 
 ## Preview, errors
 
-You don't have to preview: `bin/ship` checks everything. To run a quick match yourself:
-`php -S 127.0.0.1:8001 -t public >/dev/null 2>&1 &`, then `curl -s 127.0.0.1:8001/bot/<ClassName>`
-(it plays the 3 trial matches). In a fresh worktree, `vendor/` is missing until you run `bin/setup`.
+Don't preview: `bin/ship` checks everything, and the results are for the TV. In a fresh worktree, `vendor/`
+is missing until you run `bin/setup`.
 
 ## Never
 

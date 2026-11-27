@@ -3,7 +3,7 @@
 {% block title %}Match #{{ game.id }} · Bot Arena{% endblock %}
 
 {% block body %}
-    <h1>Match #{{ game.id }}{{ game.trial ? ' · hoodie trial' }}</h1>
+    <h1>Match #{{ game.id }}{{ game.trial ? ' · trial vs The House' }}</h1>
     <p class="muted">{{ game.playedAt|date('l H:i') }}</p>
     <div class="arena" data-arena data-game="{{ game.forPlayer|json_encode }}"></div>
     <p class="row">

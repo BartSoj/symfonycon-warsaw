@@ -2,7 +2,7 @@
 # level: quick (a few lines), medium (a small algorithm), big (for the ambitious)
 - id: survivor
   title: 🛟 The survivor
-  pitch: Never drive into a wall or a trail. Go straight while it's safe, otherwise turn. That's Rookie, enough for a T-shirt but not for the hoodie.
+  pitch: Never drive into a wall or a trail. Go straight while it's safe, otherwise turn. That's Rookie, and it loses to The House.
   level: quick
 - id: wall-hugger
   title: 🧱 The wall hugger

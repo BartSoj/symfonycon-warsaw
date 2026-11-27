@@ -39,9 +39,8 @@ class CheckCommand
                 $survived = max($survived, $i < 3 ? League::survived($replay, 0) : 0);
             }
             $verdict = $info['house'] ? '' : " · beats The House $wins/3, survives up to $survived ticks: ".match (true) {
-                $wins >= 2 => 'hoodie 🧥 + T-shirt 👕',
-                $wins >= 1 || $survived >= League::SURVIVE => 'T-shirt 👕 (2 wins for the hoodie)',
-                default => 'nothing yet (survive '.League::SURVIVE.' ticks for a T-shirt)',
+                $wins >= 2 => '🏆',
+                default => 'not yet (it needs 2 wins)',
             };
             $io->writeln(\sprintf('%s bot %s "%s" by %s%s', $problems ? '<error>FAIL</error>' : '<info>ok</info>', $key, $info['name'], $info['author'], $verdict));
             foreach (array_unique($problems) as $problem) {

@@ -7,7 +7,7 @@
     <div class="tv">
         <div class="tv-side">
             <img class="qr" src="{{ qr }}" alt="QR code to {{ url }}">
-            <p class="tv-pitch"><b>Build a bot,<br><span class="accent">win merch.</span></b></p>
+            <p class="tv-pitch"><b>Build a bot,<br><span class="accent">beat The House.</span></b></p>
             {% include '_rewards.html.twig' %}
             <p class="muted">Tell the agent in PhpStorm Air your strategy. Scan to see your bot.</p>
             <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
@@ -26,7 +26,7 @@
         <div class="tv-board">
             <h2>Leaderboard</h2>
             <div id="tv-board">{% include '_leaderboard.html.twig' with {rows: rows, compact: true} %}</div>
-            <p class="muted">🧥 hoodie · 👕 T-shirt</p>
+            <p class="muted">🏆 beat The House</p>
         </div>
     </div>
 {% endblock %}

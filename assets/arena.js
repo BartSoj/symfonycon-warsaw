@@ -22,7 +22,7 @@ async function play(view, game) {
     c.style.width = '100%'; c.style.aspectRatio = `${w} / ${h}`;
     ctx.scale(dpr, dpr);
 
-    view.head.innerHTML = (game.trial ? '<span class="tag hoodie">🧥 hoodie trial</span> ' : '')
+    view.head.innerHTML = (game.trial ? '<span class="tag hoodie">🎯 trial vs The House</span> ' : '')
         + players.map(p => `<span class="pl"><span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></span>`).join('<span class="vs">vs</span>');
     view.result.innerHTML = '&nbsp;';
 

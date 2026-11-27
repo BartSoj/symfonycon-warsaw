@@ -100,3 +100,33 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 .tv-board h2 { margin-top: 0; }
 .board.compact a { padding: 7px 10px; margin: 5px 0; }
 @media (max-width: 1100px) { .tv { grid-template-columns: 1fr; } }
+
+/* /finale: every bot on one arena (assets/finale.js) */
+.finale-page .wrap { padding: 14px 20px; }
+.finale { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+.finale-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.finale-head h1 { margin: 0; font-size: 1.8rem; }
+.finale-count { font-size: 1.2rem; font-weight: 600; color: var(--accent); }
+.finale-controls { margin-left: auto; display: flex; gap: 6px; }
+.finale-controls .btn { padding: .35rem .7rem; }
+.finale-controls .btn-outline.on { background: var(--accent); color: var(--accent-fg); }
+.finale-stage { position: relative; display: inline-block; max-width: 100%; }
+.finale-stage canvas { display: block; border-radius: 8px; }
+.finale-overlay { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.finale-overlay.show { background: rgb(13 14 18 / .75); border-radius: 8px; }
+.countdown { font-size: 9rem; font-weight: 800; color: #fff; text-shadow: 0 0 40px var(--accent); }
+.podium { text-align: center; font-size: 1.4rem; }
+.podium .winner { font-size: 3.5rem; font-weight: 800; color: var(--gold); }
+.podium ol { text-align: left; display: inline-block; margin: 16px 0 0; }
+.finale-standings { list-style: none; padding: 0; margin: 0 0 14px; }
+.finale-standings li { display: flex; gap: 8px; align-items: center; padding: 5px 10px; margin: 4px 0; border-radius: 8px; background: var(--card); white-space: nowrap; overflow: hidden; }
+.finale-standings li.out { opacity: .45; background: none; }
+.finale-standings .place { width: 1.8em; color: var(--muted); }
+.finale-feed { font-size: .9rem; }
+.finale-feed div { margin: 4px 0; }
+.finale-empty { text-align: center; padding: 15vh 0; }
+.finale-wait { font-size: 1.3rem; text-align: center; }
+.finale-staff { margin-top: 30px; font-size: 1rem; }
+.finale-form { display: grid; gap: 8px; max-width: 520px; margin: 10px 0; }
+.finale-form input:not([type=checkbox]), .finale-form select { margin-left: 6px; background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; }
+@media (max-width: 1000px) { .finale { grid-template-columns: 1fr; } }

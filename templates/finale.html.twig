@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ finale.title ?? 'The Grand Finale' }} · Bot Arena{% endblock %}
+{% block body_class %}tv-page finale-page{% endblock %}
+{% block javascripts %}{{ importmap(['app', 'finale']) }}{% endblock %}
+
+{% block body %}
+    {% if finale %}
+        <div class="finale" data-finale="{{ {id: finale.id, title: finale.title, replay: finale.replay}|json_encode }}" data-autostart="{{ app.request.query.get('autostart') ? 1 : 0 }}"></div>
+    {% else %}
+        <div class="finale-empty"><h1>🏁 The Grand Finale</h1><p class="muted">Every bot on one arena, at 5pm. Nothing computed yet.</p></div>
+    {% endif %}
+    {% if running or app.request.query.get('wait') %}
+        <p class="finale-wait" data-finale-wait="{{ finale.id ?? 0 }}">⏳ Computing a new finale…</p>
+    {% endif %}
+
+    <details class="finale-staff">
+        <summary>Staff</summary>
+        <form method="post" action="{{ path('finale_run') }}" class="finale-form">
+            <label>Title <input name="title" value="The Grand Finale"></label>
+            <label>Bots <select name="bots"><option value="all">All visitor bots</option><option value="arena">Only bots in the arena</option></select></label>
+            <label>Start <select name="start"><option value="ring">Ring, riding clockwise</option><option value="center">Everyone faces the middle</option><option value="random">Random directions</option></select></label>
+            <label>Room per bot <input name="cells" type="number" value="360" min="80" max="2000"> cells</label>
+            <label>Walls <input name="walls" type="number" value="0" min="0" max="60"></label>
+            <label><input type="checkbox" name="vanish" value="1"> Trails vanish when a bot crashes</label>
+            <label><input type="checkbox" name="house" value="1"> Add The House</label>
+            <button class="btn"{{ running ? ' disabled' }}>Compute a new finale</button>
+        </form>
+        <p class="muted">Computing takes a few seconds; this page loads it when it's ready. Then press Start.</p>
+        {% for f in history %}
+            <a href="{{ path('finale_show', {id: f.id}) }}">#{{ f.id }} {{ f.title }}</a> <span class="muted">{{ f.createdAt|date('H:i') }} · {{ f.seconds }} s</span><br>
+        {% endfor %}
+    </details>
+{% endblock %}

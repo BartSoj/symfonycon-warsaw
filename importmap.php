@@ -20,4 +20,8 @@ return [
         'path' => './assets/arena.js',
         'entrypoint' => true,
     ],
+    'finale' => [
+        'path' => './assets/finale.js',
+        'entrypoint' => true,
+    ],
 ];

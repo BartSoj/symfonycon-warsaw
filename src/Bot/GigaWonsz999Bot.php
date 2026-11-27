@@ -41,7 +41,7 @@ final class GigaWonsz999Bot implements Bot
 
     public function name(): string { return 'GigaWonsz999'; }
     public function author(): string { return 'Jann'; }
-    public function color(): string { return '#39ff14'; }
+    public function color(): string { return '#000080'; }
 
     public function move(Arena $arena): Direction
     {

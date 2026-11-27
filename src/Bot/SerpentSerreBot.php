@@ -173,27 +173,43 @@ final class SerpentSerreBot implements Bot
         return $r;
     }
 
-    /** Free cells reachable from the neighbours of $idx. */
+    /**
+     * Usable space after stepping on $idx (which is already blocked).
+     * Closing-a-surface detection: each free neighbour is flooded separately. If the step splits
+     * the free space into several zones, only the biggest one counts, because the snake can
+     * only go into one of them. The others are lost.
+     */
     private function flood(int $idx): int
     {
         $s = ++$this->stamp;
-        $stack = [$idx];
         $this->seen[$idx] = $s;
-        $count = 0;
         $free = $this->free;
-        while ($stack !== []) {
-            $c = array_pop($stack);
-            foreach ($this->offsets as $o) {
-                $n = $c + $o;
-                if ($free[$n] && $this->seen[$n] !== $s) {
-                    $this->seen[$n] = $s;
-                    $count++;
-                    $stack[] = $n;
+        $best = 0;
+        foreach ($this->offsets as $start) {
+            $first = $idx + $start;
+            if (!$free[$first] || $this->seen[$first] === $s) {
+                continue; // wall, or same zone as a neighbour already flooded
+            }
+            $this->seen[$first] = $s;
+            $stack = [$first];
+            $count = 1;
+            while ($stack !== []) {
+                $c = array_pop($stack);
+                foreach ($this->offsets as $o) {
+                    $n = $c + $o;
+                    if ($free[$n] && $this->seen[$n] !== $s) {
+                        $this->seen[$n] = $s;
+                        $count++;
+                        $stack[] = $n;
+                    }
                 }
+            }
+            if ($count > $best) {
+                $best = $count;
             }
         }
 
-        return $count;
+        return $best;
     }
 
     /** @return array{int, int, bool} cells I reach first, cells the opponent reaches first, whether our regions touch */

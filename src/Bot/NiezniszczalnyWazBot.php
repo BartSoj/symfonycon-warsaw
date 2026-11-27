@@ -12,7 +12,7 @@ use App\Arena\Direction;
  */
 final class NiezniszczalnyWazBot implements Bot
 {
-    public function name(): string { return 'Niezniszczalny Wąż'; }
+    public function name(): string { return 'Batman'; }
     public function author(): string { return 'Anonim'; }
     public function color(): string { return '#39ff14'; }
 

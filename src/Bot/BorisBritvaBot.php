@@ -7,7 +7,7 @@ use App\Arena\Bot;
 use App\Arena\Direction;
 
 /**
- * Theseus: a maze-solver. Re-plans every move, but commits to a strategy for at least 5 moves.
+ * Boris Britva: a maze-solver. Re-plans every move, but commits to a strategy for at least 5 moves.
  *
  *  - TERRITORY: Voronoi partition (simultaneous BFS) – grab more cells than the opponent.
  *  - ATTACK:    A* towards a cell ahead of the opponent to cut it off.
@@ -15,7 +15,7 @@ use App\Arena\Direction;
  *
  * Every move, whatever the strategy, is guarded by a flood fill so we never ride into a dead end.
  */
-final class TheseusBot implements Bot
+final class BorisBritvaBot implements Bot
 {
     private const LOCK = 5;
     private const BUDGET_NS = 2_300_000_000; // stay well under the 3 s match budget
@@ -27,7 +27,7 @@ final class TheseusBot implements Bot
     private array $nbr = [];
     private int $w = 0;
 
-    public function name(): string { return 'Theseus'; }
+    public function name(): string { return 'Boris Britva'; }
     public function author(): string { return 'Ariadne'; }
     public function color(): string { return '#ffb000'; }
 

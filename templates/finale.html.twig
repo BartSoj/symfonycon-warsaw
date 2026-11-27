@@ -25,15 +25,17 @@
             <label><input type="checkbox" name="house" value="1"> Add The House</label>
             <label><input type="checkbox" name="vanish" value="1"> Trails vanish when a bot crashes</label>
             <fieldset><legend class="muted">Custom</legend>
-                <label>Layout <select name="layout"><option>open</option><option>pillars</option><option>rooms</option><option>rings</option><option>cross</option></select></label>
-                <label>Start <select name="start"><option value="ring">Ring, riding clockwise</option><option value="center">Everyone faces the middle</option><option value="random">Random directions</option></select></label>
-                <label>Room per bot <input name="cells" type="number" value="360" min="80" max="2000"> cells</label>
+                <label>Layout <select name="layout"><option>pens</option><option>open</option><option>pillars</option><option>rooms</option><option>rings</option><option>cross</option></select></label>
+                <label>Pens: start facing <select name="facing"><option value="back">Away from the door</option><option value="side">Sideways</option><option value="door">The door</option></select></label>
+                <label>Pens: depth <input name="pen" type="number" value="5" min="3" max="12">, door <input name="door" type="number" value="2" min="1" max="6"> cells wide</label>
+                <label>Other layouts: start <select name="start"><option value="ring">Ring, riding clockwise</option><option value="center">Everyone faces the middle</option><option value="random">Random directions</option></select></label>
+                <label>Room per bot <input name="cells" type="number" value="90" min="30" max="2000"> cells (pens: of the open middle)</label>
                 <label>Random walls <input name="walls" type="number" value="0" min="0" max="60"></label>
             </fieldset>
+            <label>Rounds <input name="rounds" type="number" value="1" min="1" max="10"> battles on this map, new seats each time</label>
             <label>Title <input name="title" value="The Grand Finale"></label>
             <div class="row">
-                <button class="btn"{{ running ? ' disabled' }}>Compute one</button>
-                <button class="btn btn-outline" name="all" value="1"{{ running ? ' disabled' }}>Compute every map ({{ maps|length }}, about a minute)</button>
+                <button class="btn"{{ running ? ' disabled' }}>Compute</button>
             </div>
         </form>
 

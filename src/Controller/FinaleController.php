@@ -69,14 +69,18 @@ class FinaleController extends AbstractController
     {
         if (!$this->running()) {
             $r = $request->request;
-            $map = $r->get('all') ? null : (isset(Battle::MAPS[$r->get('map')]) ? $r->get('map') : 'custom');
+            $map = isset(Battle::MAPS[$r->get('map')]) ? $r->get('map') : 'custom';
             $args = [
-                $map ? '--map='.$map : '--all-maps',
-                '--layout='.(\in_array($r->get('layout'), ['open', 'pillars', 'rooms', 'rings', 'cross'], true) ? $r->get('layout') : 'open'),
+                '--map='.$map,
+                '--rounds='.max(1, min(10, $r->getInt('rounds', 1))),
+                '--layout='.(\in_array($r->get('layout'), ['pens', 'open', 'pillars', 'rooms', 'rings', 'cross'], true) ? $r->get('layout') : 'pens'),
+                '--facing='.(\in_array($r->get('facing'), ['back', 'side', 'door'], true) ? $r->get('facing') : 'back'),
+                '--pen='.max(3, min(12, $r->getInt('pen', 5))),
+                '--door='.max(1, min(6, $r->getInt('door', 2))),
                 '--bots='.($r->get('bots') === 'arena' ? 'arena' : 'all'),
                 '--start='.(\in_array($r->get('start'), ['ring', 'center', 'random'], true) ? $r->get('start') : 'ring'),
                 '--walls='.max(0, min(60, $r->getInt('walls'))),
-                '--cells='.max(80, min(2000, $r->getInt('cells', 360))),
+                '--cells='.max(30, min(2000, $r->getInt('cells', 90))),
                 '--title='.mb_substr(trim($r->get('title', '')) ?: 'The Grand Finale', 0, 60),
             ];
             if ($r->get('house')) {

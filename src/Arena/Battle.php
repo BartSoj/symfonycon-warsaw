@@ -10,6 +10,7 @@ final class Battle
 {
     /** Map presets for the finale. Any DEFAULTS key can be set; staff pick one on /finale or with --map. */
     public const MAPS = [
+        'pens' => ['label' => 'The pens', 'map' => 'pens', 'cells' => 90],
         'open' => ['label' => 'Open field'],
         'pillars' => ['label' => 'Pillars', 'map' => 'pillars', 'cells' => 400],
         'rooms' => ['label' => 'Four rooms', 'map' => 'rooms', 'cells' => 400],
@@ -23,8 +24,11 @@ final class Battle
 
     public const DEFAULTS = [
         'label' => 'Custom',
-        'map' => 'open',     // wall layout: open, pillars, rooms, rings, cross
-        'cells' => 360,      // free cells per bot when the size is automatic
+        'map' => 'open',     // wall layout: pens, open, pillars, rooms, rings, cross
+        'cells' => 360,      // free cells per bot when the size is automatic (pens: of the open middle)
+        'pen' => 5,          // pens: how deep each bot's pen is
+        'door' => 2,         // pens: how wide the way out is
+        'facing' => 'back',  // pens: where bots face at the start: back (they turn around to get out), side or door
         'w' => null, 'h' => null,
         'walls' => 0,        // random wall segments on top of the layout; -1 = a lot
         'start' => 'ring',   // ring: spread on a ring riding clockwise; center: all facing the middle; random
@@ -45,31 +49,17 @@ final class Battle
         $rng = new \Random\Randomizer(new \Random\Engine\Mt19937($seed));
         $keys = $rng->shuffleArray(array_values($keys)); // random seats
         $n = \count($keys);
-        $w = (int) ($o['w'] ?: max(36, ceil(sqrt($n * $o['cells'] * 1.6))));
-        $h = (int) ($o['h'] ?: max(22, round($w / 1.6)));
-
-        $starts = [];
-        $taken = [];
-        for ($i = 0; $i < $n; ++$i) {
-            $a = 2 * M_PI * $i / $n - M_PI / 2;
-            $x = (int) round(($w - 1) / 2 + cos($a) * ($w - 1) * .38);
-            $y = (int) round(($h - 1) / 2 + sin($a) * ($h - 1) * .38);
-            while (isset($taken[$y * $w + $x])) {
-                ++$x;
-            }
-            $taken[$y * $w + $x] = true;
-            [$dx, $dy] = match ($o['start']) {
-                'center' => [($w - 1) / 2 - $x, ($h - 1) / 2 - $y],
-                'random' => [[1, -1, 0, 0][$k = $rng->getInt(0, 3)], [0, 0, 1, -1][$k]],
-                default => [-sin($a), cos($a)], // clockwise on screen (y points down)
-            };
-            $d = abs($dx) >= abs($dy) ? ($dx > 0 ? Direction::Right : Direction::Left) : ($dy > 0 ? Direction::Down : Direction::Up);
-            $starts[] = [$x, $y, $d];
+        if ('pens' === $o['map']) {
+            [$w, $h, $fixed, $starts] = $this->pens($n, $o);
+        } else {
+            $w = (int) ($o['w'] ?: max(36, ceil(sqrt($n * $o['cells'] * 1.6))));
+            $h = (int) ($o['h'] ?: max(22, round($w / 1.6)));
+            [$fixed, $starts] = [[], $this->ring($n, $w, $h, $o['start'], $rng)];
         }
 
         // Walls: the map's layout plus random segments, but never right next to or in front of a start.
-        $cells = $this->layout($o['map'], $w, $h);
-        for ($i = 0, $n = $o['walls'] < 0 ? (int) round($w * $h / 70) : $o['walls']; $i < $n; ++$i) {
+        $cells = 'pens' === $o['map'] ? [] : $this->layout($o['map'], $w, $h);
+        for ($i = 0, $segments = $o['walls'] < 0 ? (int) round($w * $h / 70) : $o['walls']; $i < $segments; ++$i) {
             $vertical = 1 === $rng->getInt(0, 1);
             $x = $rng->getInt(0, $w - 1);
             $y = $rng->getInt(0, $h - 1);
@@ -78,6 +68,9 @@ final class Battle
             }
         }
         $owner = [];
+        foreach ($fixed as [$px, $py]) {
+            $owner[$py * $w + $px] = 'wall';
+        }
         foreach ($cells as [$px, $py]) {
             if ($px < 0 || $py < 0 || $px >= $w || $py >= $h) {
                 continue;
@@ -183,6 +176,103 @@ final class Battle
         }
 
         return ['w' => $w, 'h' => $h, 'walls' => $walls, 'players' => $players, 'winner' => 1 === \count($alive) ? $alive[0] : null, 'ticks' => $tick, 'vanish' => (bool) $o['vanish'], 'options' => $o];
+    }
+
+    /** @return list<array{int, int, Direction}> starts spread on an ellipse */
+    private function ring(int $n, int $w, int $h, string $start, \Random\Randomizer $rng): array
+    {
+        $starts = [];
+        $taken = [];
+        for ($i = 0; $i < $n; ++$i) {
+            $a = 2 * M_PI * $i / $n - M_PI / 2;
+            $x = (int) round(($w - 1) / 2 + cos($a) * ($w - 1) * .38);
+            $y = (int) round(($h - 1) / 2 + sin($a) * ($h - 1) * .38);
+            while (isset($taken[$y * $w + $x])) {
+                ++$x;
+            }
+            $taken[$y * $w + $x] = true;
+            [$dx, $dy] = match ($start) {
+                'center' => [($w - 1) / 2 - $x, ($h - 1) / 2 - $y],
+                'random' => [[1, -1, 0, 0][$k = $rng->getInt(0, 3)], [0, 0, 1, -1][$k]],
+                default => [-sin($a), cos($a)], // clockwise on screen (y points down)
+            };
+            $d = abs($dx) >= abs($dy) ? ($dx > 0 ? Direction::Right : Direction::Left) : ($dy > 0 ? Direction::Down : Direction::Up);
+            $starts[] = [$x, $y, $d];
+        }
+
+        return $starts;
+    }
+
+    /**
+     * Every bot starts in its own pen along the edge of the board, with one door to an open field in the middle.
+     * Bots first have to get out, then they all meet in the middle.
+     *
+     * @return array{int, int, list<array{int, int}>, list<array{int, int, Direction}>} width, height, walls, starts
+     */
+    private function pens(int $n, array $o): array
+    {
+        $d = max(3, (int) $o['pen']);
+        $door = max(1, (int) $o['door']);
+        $aw = (int) ($o['w'] ? $o['w'] - 2 * ($d + 1) : max(30, ceil(sqrt($n * $o['cells'] * 1.6))));
+        $ah = (int) ($o['h'] ? $o['h'] - 2 * ($d + 1) : max(18, round($aw / 1.6)));
+        while (2 * ($aw + $ah) < $n * ($d + 1)) { // every pen at least as wide as it is deep
+            $aw += 2;
+            $ah = max($ah, (int) round($aw / 1.6));
+        }
+        $w = $aw + 2 * ($d + 1);
+        $h = $ah + 2 * ($d + 1);
+
+        // The four sides, clockwise from the top: length, (along, depth from the edge) => cell, inwards, clockwise.
+        $sides = [
+            [$aw, fn ($u, $v) => [$d + 1 + $u, $v], Direction::Down, Direction::Right],
+            [$ah, fn ($u, $v) => [$w - 1 - $v, $d + 1 + $u], Direction::Left, Direction::Down],
+            [$aw, fn ($u, $v) => [$w - 2 - $d - $u, $h - 1 - $v], Direction::Up, Direction::Left],
+            [$ah, fn ($u, $v) => [$v, $h - 2 - $d - $u], Direction::Right, Direction::Up],
+        ];
+        $perimeter = 2 * ($aw + $ah);
+        $count = [intdiv($n * $aw, $perimeter), intdiv($n * $ah, $perimeter)];
+        $count = [$count[0], $count[1], $count[0], $count[1]];
+        for ($i = 0; array_sum($count) < $n; ++$i) {
+            ++$count[[0, 2, 1, 3][$i]];
+        }
+
+        $walls = [];
+        for ($x = 0; $x <= $d; ++$x) { // solid corners
+            for ($y = 0; $y <= $d; ++$y) {
+                array_push($walls, [$x, $y], [$w - 1 - $x, $y], [$x, $h - 1 - $y], [$w - 1 - $x, $h - 1 - $y]);
+            }
+        }
+        $starts = [];
+        foreach ($sides as $s => [$len, $at, $in, $clockwise]) {
+            $k = $count[$s];
+            $doors = [];
+            $u0 = 0;
+            for ($j = 0; $j < $k; ++$j) {
+                $pw = intdiv($len - $k + 1, $k) + ($j < ($len - $k + 1) % $k ? 1 : 0);
+                $mid = $u0 + intdiv($pw - 1, 2);
+                for ($u = $mid - intdiv($door - 1, 2), $end = $u + $door; $u < $end; ++$u) {
+                    $doors[$u] = true;
+                }
+                $starts[] = [...$at($mid, intdiv($d - 1, 2)), match ($o['facing']) {
+                    'door' => $in,
+                    'back' => $in->opposite(),
+                    default => $clockwise,
+                }];
+                for ($v = 0; $v < $d && $j < $k - 1; ++$v) {
+                    $walls[] = $at($u0 + $pw, $v);
+                }
+                $u0 += $pw + 1;
+            }
+            for ($u = 0; $u < $len; ++$u) {
+                for ($v = $k ? $d : 0; $v <= $d; ++$v) { // a side without pens is solid
+                    if (!isset($doors[$u]) || $v < $d) {
+                        $walls[] = $at($u, $v);
+                    }
+                }
+            }
+        }
+
+        return [$w, $h, $walls, $starts];
     }
 
     /** @return list<array{int, int}> wall cells of a layout */

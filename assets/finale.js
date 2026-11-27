@@ -4,6 +4,12 @@
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const STEP = {U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0]};
+// Colours too dark to see on the black board are inverted (black → white, navy → yellow).
+const visible = c => {
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(String(c).slice(i, i + 2), 16));
+    if ([r, g, b].some(Number.isNaN) || .2126 * r + .7152 * g + .0722 * b > 40) return c;
+    return '#' + [r, g, b].map(v => (255 - v).toString(16).padStart(2, '0')).join('');
+};
 const BATTLE_MS = 45000; // a battle lasts about this long at 1×
 const PODIUM_MS = 7000;  // between battles
 
@@ -30,6 +36,7 @@ if (el) {
 
     const load = i => {
         const {title, replay} = games[i];
+        for (const p of replay.players) p.color = visible(p.color);
         const paths = replay.players.map(p => {
             const pts = [[p.x, p.y]];
             for (const m of p.moves) { const [x, y] = pts.at(-1); pts.push([x + STEP[m][0], y + STEP[m][1]]); }

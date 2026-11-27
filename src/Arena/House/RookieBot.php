@@ -16,7 +16,7 @@ final class RookieBot implements Bot
 
     public function author(): string
     {
-        return 'JetBrains';
+        return 'the Arena';
     }
 
     public function color(): string

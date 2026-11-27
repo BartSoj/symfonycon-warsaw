@@ -2,12 +2,14 @@
 
 namespace App\Arena;
 
+use App\Entity\Entry;
 use App\Entity\Game;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * The leaderboard (Elo), matchmaking for the TV, and the trial: 3 matches against The House.
  * Win 2 of them for a hoodie; win one or survive SURVIVE ticks in one for a T-shirt.
+ * New bots are off: they only play The House until someone taps "Enter the arena" (an Entry).
  */
 final class League
 {
@@ -19,13 +21,14 @@ final class League
     {
     }
 
-    /** @return list<array> current bots, best first, with elo, played, wins, losses, draws, hoodie and tshirt (null = trial not played yet) */
+    /** @return list<array> current bots, best first, with enabled, elo, played, wins, losses, draws, hoodie and tshirt (null = trial not played yet) */
     public function leaderboard(): array
     {
+        $entered = array_flip(array_column($this->em->createQuery('SELECT e.bot FROM App\Entity\Entry e')->getArrayResult(), 'bot'));
         $rows = [];
         foreach ($this->bots->keys() as $key) {
             $info = $this->bots->info($key);
-            $rows[$info['id']] = $info + ['elo' => 1000.0, 'played' => 0, 'wins' => 0, 'losses' => 0, 'draws' => 0, 'hoodie' => null, 'tshirt' => null];
+            $rows[$info['id']] = $info + ['enabled' => $info['house'] || isset($entered[$key]), 'elo' => 1000.0, 'played' => 0, 'wins' => 0, 'losses' => 0, 'draws' => 0, 'hoodie' => null, 'tshirt' => null];
         }
         $elo = [];
         $games = $this->em->createQuery('SELECT g.a, g.b, g.winner FROM App\Entity\Game g WHERE g.trial = false ORDER BY g.id')->getArrayResult();
@@ -58,7 +61,7 @@ final class League
         return $rows;
     }
 
-    /** Runs the next match for the TV: a pending hoodie trial first, else the bot with the fewest games. */
+    /** Runs the next match for the TV: a pending trial first, else the arena bot with the fewest games. */
     public function next(): Game
     {
         foreach ($this->bots->keys() as $key) {
@@ -67,7 +70,7 @@ final class League
             }
         }
 
-        $played = array_column($this->leaderboard(), 'played', 'key');
+        $played = array_column(array_filter($this->leaderboard(), fn ($r) => $r['enabled']), 'played', 'key');
         $keys = array_keys($played);
         shuffle($keys);
         usort($keys, fn ($x, $y) => $played[$x] <=> $played[$y]);
@@ -96,6 +99,26 @@ final class League
         $survived = max([0, ...array_map(fn (Game $g) => $g->survived, $games)]);
 
         return ['games' => array_values($games), 'wins' => $wins, 'survived' => $survived, 'passed' => $wins >= 2, 'tshirt' => $wins >= 1 || $survived >= self::SURVIVE];
+    }
+
+    /** Puts a bot in the shared arena, or takes it out. */
+    public function toggle(string $key): void
+    {
+        if ($entry = $this->em->find(Entry::class, $key)) {
+            $this->em->remove($entry);
+        } else {
+            $entry = new Entry();
+            $entry->bot = $key;
+            $entry->enteredAt = new \DateTimeImmutable();
+            $this->em->persist($entry);
+        }
+        $this->em->flush();
+    }
+
+    /** A private test match against The House on a random arena. Not saved, not counted. */
+    public function practice(string $key): array
+    {
+        return ['id' => null, 'trial' => false, 'replay' => $this->referee->play($key, self::HOUSE, random_int(1, 2 ** 31 - 1))];
     }
 
     /** @return list<Game> */

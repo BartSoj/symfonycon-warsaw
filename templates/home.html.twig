@@ -23,7 +23,13 @@
 
     <h2>Leaderboard</h2>
     <p class="muted">Elo rating · wins–losses–draws. A new version of a bot starts again from 1000.</p>
-    {% include '_leaderboard.html.twig' with {rows: rows} %}
+    {% include '_leaderboard.html.twig' with {rows: rows|filter(r => r.enabled)} %}
+    {% set garage = rows|filter(r => not r.enabled) %}
+    {% if garage %}
+        <h2>🔧 In the garage</h2>
+        <p class="muted">New bots start here: they only play The House until their owner enters them in the arena. Tap yours.</p>
+        {% include '_leaderboard.html.twig' with {rows: garage, compact: true} %}
+    {% endif %}
 
     <h2>Need a strategy?</h2>
     {% for idea in ideas() %}

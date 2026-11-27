@@ -71,6 +71,8 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 /* Bot page */
 .trial { border-width: 2px; }
 .trial.passed { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--card)); }
+.entry p { margin: 0 0 8px; }
+.entry.on { border-color: var(--ok); }
 .trial.tshirt { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
 .trial p { margin: 0 0 6px; }
 .trial-games { display: flex; gap: 14px; }

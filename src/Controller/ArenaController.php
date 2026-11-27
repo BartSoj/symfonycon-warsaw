@@ -7,6 +7,7 @@ use App\Arena\League;
 use App\Entity\Game;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,6 +39,27 @@ class ArenaController extends AbstractController
             'recent' => $league->recent($name),
             'source' => $bots->source($name),
         ]);
+    }
+
+    #[Route('/bot/{name}/toggle', name: 'bot_toggle', methods: ['POST'])]
+    public function toggle(string $name, Bots $bots, League $league): RedirectResponse
+    {
+        if ($bots->has($name) && !$bots->info($name)['house']) {
+            $league->toggle($name);
+        }
+
+        return $this->redirectToRoute('bot', ['name' => $name]);
+    }
+
+    /** A test match against The House, just for this bot's page. */
+    #[Route('/bot/{name}/practice', name: 'bot_practice')]
+    public function practice(string $name, Bots $bots, League $league): JsonResponse
+    {
+        if (!$bots->has($name)) {
+            throw new NotFoundHttpException("No bot called $name");
+        }
+
+        return $this->json($league->practice($name));
     }
 
     #[Route('/game/{id}', name: 'game', requirements: ['id' => '\d+'])]

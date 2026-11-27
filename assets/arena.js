@@ -2,7 +2,7 @@
 //   data-game='{"id":1,"replay":{...}}'  plays that match (and replays it on tap)
 //   data-loop="/arena/next"              fetches and plays new matches forever (the TV)
 //   data-board="/tv/board"               with data-loop: refreshes #tv-board after each match
-// A link with data-arena-next plays a fresh match in the first player on the page.
+// A link with data-arena-next fetches its href (or /arena/next) and plays that match in the first player on the page.
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
@@ -106,9 +106,10 @@ for (const a of document.querySelectorAll('[data-arena-next]')) {
     a.addEventListener('click', async e => {
         e.preventDefault();
         const view = document.querySelector('[data-arena]')._arena;
+        const label = a.textContent;
         a.textContent = '⏳ Playing…';
-        const game = await (await fetch('/arena/next')).json();
-        a.textContent = '▶ Play a new match';
+        const game = await (await fetch(a.getAttribute('href') !== '#' ? a.href : '/arena/next')).json();
+        a.textContent = label;
         play(view, game);
         view.canvas.onclick = () => play(view, game);
     });

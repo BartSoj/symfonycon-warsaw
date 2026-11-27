@@ -20,6 +20,7 @@ The size (28–44 × 18–26) and the walls change from match to match, so never
 - Ask the visitor three things, or pick fun defaults if they don't care: a **bot name**, their **first name
   or handle**, and a **colour**. Their strategy idea can be vague: build the simplest version that works. Ideas
   are in `data/ideas.yaml` and on the home page.
+- Don't open other people's bots in `src/Bot/`: the visitor's bot is their own idea.
 - Create **exactly one file**: `src/Bot/<Name>Bot.php`, with the class named after the visitor or the bot
   (for example `src/Bot/AnnaViperBot.php`). If the file already exists and isn't theirs, pick another name.
   When they come back to improve their bot, edit only their own file.
@@ -89,8 +90,10 @@ If it prints FAIL, fix the error it shows and run it again. Ship the visitor's i
 if it wins nothing: they can come back and improve it. If it reports a rebase conflict, keep both sides and follow its
 instructions.
 
-When it's done, tell the visitor in one sentence what it won, that it's on the TV now, and that their trial
-result is on their phone: from the home page, tap their bot in the leaderboard (`/bot/<ClassName>`).
+When it's done, tell the visitor in one sentence what it won, that its trial plays on the TV now, and that
+their bot's page is on their phone: from the home page, tap it under "In the garage" (`/bot/<ClassName>`).
+New bots only play The House. On that page they can run test matches and tap "Enter the arena" to race
+everyone else's bots.
 
 ## The app (you shouldn't need to touch it)
 

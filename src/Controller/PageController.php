@@ -31,13 +31,13 @@ class PageController extends AbstractController
     {
         $url = $this->generateUrl('home', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return $this->render('tv.html.twig', ['url' => $url, 'qr' => (new QRCode())->render($url), 'merch' => self::MERCH, 'rows' => \array_slice($league->leaderboard(), 0, 10)]);
+        return $this->render('tv.html.twig', ['url' => $url, 'qr' => (new QRCode())->render($url), 'merch' => self::MERCH, 'rows' => \array_slice(array_values(array_filter($league->leaderboard(), fn ($r) => $r['enabled'])), 0, 10)]);
     }
 
     /** The TV's leaderboard, refreshed after every match. */
     #[Route('/tv/board', name: 'tv_board')]
     public function tvBoard(League $league): Response
     {
-        return $this->render('_leaderboard.html.twig', ['rows' => \array_slice($league->leaderboard(), 0, 10), 'compact' => true]);
+        return $this->render('_leaderboard.html.twig', ['rows' => \array_slice(array_values(array_filter($league->leaderboard(), fn ($r) => $r['enabled'])), 0, 10), 'compact' => true]);
     }
 }

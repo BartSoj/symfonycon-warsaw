@@ -5,6 +5,17 @@
 {% block body %}
     <h1><span class="swatch big" style="background: {{ bot.color }}"></span> {{ bot.name }}</h1>
     <p class="muted">by {{ bot.author }} · #{{ rank }} on the leaderboard · Elo {{ bot.elo }} · {{ bot.wins }} wins, {{ bot.losses }} losses, {{ bot.draws }} draws</p>
+    {% if not bot.house %}
+        <form method="post" action="{{ path('bot_toggle', {name: bot.key}) }}" class="card entry {{ bot.enabled ? 'on' }}">
+            {% if bot.enabled %}
+                <p><b>🏁 In the arena.</b> It plays everyone's bots on the TV and is on the leaderboard.</p>
+                <button class="btn btn-outline">Back to the garage</button>
+            {% else %}
+                <p><b>🔧 In the garage.</b> It only plays The House: its trial and your test matches. Nobody else's bot gets in the way.</p>
+                <button class="btn">🏁 Enter the arena</button>
+            {% endif %}
+        </form>
+    {% endif %}
     {% if bot.problem %}<div class="card warn">⚠️ {{ bot.problem }}</div>{% endif %}
 
     {% if trial %}
@@ -26,6 +37,13 @@
                 {% endfor %}
             </div>
         </div>
+    {% endif %}
+
+    {% if not bot.house %}
+        <h2>Test it</h2>
+        {% set first = trial.games|first %}
+        <div class="arena" data-arena {% if first %}data-game="{{ first.forPlayer|json_encode }}"{% endif %}></div>
+        <p class="row"><a class="btn" href="{{ path('bot_practice', {name: bot.key}) }}" data-arena-next>▶ Test match vs The House</a> <span class="muted">Random arena, not counted.</span></p>
     {% endif %}
 
     <h2>Recent matches</h2>

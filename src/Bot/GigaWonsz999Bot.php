@@ -40,7 +40,7 @@ final class GigaWonsz999Bot implements Bot
     private bool $checkTime = false;
 
     public function name(): string { return 'GigaWonsz999'; }
-    public function author(): string { return 'GigaWonsz'; }
+    public function author(): string { return 'Jann'; }
     public function color(): string { return '#39ff14'; }
 
     public function move(Arena $arena): Direction

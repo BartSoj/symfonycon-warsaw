@@ -28,15 +28,21 @@ class CheckCommand
             $info = $this->bots->info($key);
             $problems = array_filter([$info['problem']]);
             $wins = 0;
-            foreach ([...League::TRIAL_SEEDS, 7, 8] as $i => $seed) {
+            $survived = 0;
+            foreach ([...League::TRIAL_SEEDS, 1, 2] as $i => $seed) {
                 $replay = $this->referee->play($key, $i < 3 ? League::HOUSE : 'RookieBot', $seed);
                 $crash = $replay['players'][0]['crash'];
                 if ($crash['error'] ?? false) {
                     $problems[] = "seed $seed, tick {$crash['tick']}: {$crash['reason']}";
                 }
                 $wins += $i < 3 && 0 === $replay['winner'] ? 1 : 0;
+                $survived = max($survived, $i < 3 ? League::survived($replay, 0) : 0);
             }
-            $verdict = $info['house'] ? '' : ($wins >= 2 ? " · beats The House $wins/3: hoodie 🎉" : " · beats The House $wins/3: no hoodie yet (needs 2)");
+            $verdict = $info['house'] ? '' : " · beats The House $wins/3, survives up to $survived ticks: ".match (true) {
+                $wins >= 2 => 'hoodie 🧥 + T-shirt 👕',
+                $wins >= 1 || $survived >= League::SURVIVE => 'T-shirt 👕 (2 wins for the hoodie)',
+                default => 'nothing yet (survive '.League::SURVIVE.' ticks for a T-shirt)',
+            };
             $io->writeln(\sprintf('%s bot %s "%s" by %s%s', $problems ? '<error>FAIL</error>' : '<info>ok</info>', $key, $info['name'], $info['author'], $verdict));
             foreach (array_unique($problems) as $problem) {
                 $io->writeln("     $problem");

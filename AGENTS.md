@@ -1,15 +1,17 @@
 # AGENTS.md: SymfonyCon Bot Arena
 
-You are at the JetBrains booth at SymfonyCon Warsaw, building a **light-cycle bot** with the person standing
-next to you. They want to see it racing on the TV in a few minutes, and if it beats **The House** in 2 of 3
-trial matches, they win a PhpStorm hoodie. **Speed matters most.** Their bot is the only thing you build.
+You are at the booth at SymfonyCon Warsaw, building a **light-cycle bot** with the person standing next to
+you. They want to see it racing on the TV in a few minutes. Every new bot plays 3 trial matches against
+**The House**: surviving 100 ticks or winning one of them earns a **T-shirt**, and winning 2 of 3 earns a
+**hoodie**. **Speed matters most.** Their bot is the only thing you build.
 
 ## The game
 
-Two light cycles ride on a 32 × 20 grid, and each leaves a trail on every cell it passes. On every tick,
+Two light cycles ride on a grid, and each leaves a trail on every cell it passes. On every tick,
 both bots pick a direction at the same time. Driving into the edge, a wall, any trail, or the same cell as
 the opponent (head-on) is a crash. The last bot riding wins, and if both crash on the same tick it's a draw.
-The walls change from match to match, and the arena is 180° symmetric, so both sides are fair.
+The size (28–44 × 18–26) and the walls change from match to match, so never hardcode them. The arena is
+180° symmetric, so both sides are fair.
 
 ## How to work
 
@@ -58,7 +60,7 @@ The bot is discovered automatically (the `Bot` interface is an autoconfigured ta
 
 | What | How |
 | --- | --- |
-| Grid | `$arena->width` (32), `$arena->height` (20). `(0, 0)` is top-left, and y grows **down**. `$arena->tick` starts at 1 |
+| Grid | `$arena->width`, `$arena->height` (different every match). `(0, 0)` is top-left, and y grows **down**. `$arena->tick` starts at 1 |
 | You | `$arena->me`: a `Cycle` with `x`, `y`, `direction` |
 | Opponent | `$arena->opponents[0]`: a `Cycle` too. It moves at the same time as you |
 | Cells | `$arena->isFree($x, $y)`: false for edges, walls and every trail (yours included) |
@@ -67,12 +69,13 @@ The bot is discovered automatically (the `Bot` interface is an autoconfigured ta
 
 Rules the arena enforces:
 
-- **50 ms per move, and 1.5 s in total per match.** A slow move or an exception is a crash. A flood fill
-  over the 640 cells is easily fast enough; a deep minimax needs a depth limit.
+- **50 ms per move, and 3 s in total per match.** A slow move or an exception is a crash. A flood fill
+  over the whole grid is easily fast enough; a deep minimax needs a depth limit.
 - Every match gets a fresh `clone` of your bot, so properties are fine for remembering things.
 - No constructor arguments, no I/O: no files, network, database, `exit` or `echo`. Pure logic.
-- The Rookie strategy above loses to The House. To win the hoodie, it has to look further, for example by
-  flood-filling to count reachable space and avoiding the cells the opponent might move into.
+- The Rookie strategy above survives long enough for the T-shirt but loses to The House. To win the hoodie, it
+  has to look further, for example by flood-filling to count reachable space and avoiding the cells the
+  opponent might move into.
 
 ## Ship it
 
@@ -81,21 +84,21 @@ bin/ship "Bot name" "Visitor's first name or handle" [idea-id]
 ```
 
 It plays your bot a few times, renders every page, adds it to the arena and deploys it. It prints a line like
-`ok bot AnnaViperBot "Viper" by Anna · beats The House 2/3: hoodie 🎉`. If it prints FAIL, fix the error it
-shows and run it again. Before shipping a weaker bot, you may improve it until it beats The House, but don't
-spend more than a few minutes on it. If it reports a rebase conflict, keep both sides and follow its
+`ok bot AnnaViperBot "Viper" by Anna · beats The House 2/3, survives up to 274 ticks: hoodie 🧥 + T-shirt 👕`.
+If it prints FAIL, fix the error it shows and run it again. Ship the visitor's idea as they described it, even
+if it wins nothing: they can come back and improve it. If it reports a rebase conflict, keep both sides and follow its
 instructions.
 
-When it's done, tell the visitor in one sentence: their bot is on the TV now, and their hoodie trial is at
-`/bot/<ClassName>` on their phone (from the home page, tap their bot in the leaderboard).
+When it's done, tell the visitor in one sentence what it won, that it's on the TV now, and that their trial
+result is on their phone: from the home page, tap their bot in the leaderboard (`/bot/<ClassName>`).
 
 ## The app (you shouldn't need to touch it)
 
 | What | Where |
 | --- | --- |
 | Stack | Symfony 8.1, PHP 8.4+, Doctrine ORM on SQLite (`var/data.db`), Twig, AssetMapper. No Node, no login |
-| Engine | `src/Arena/`: `Referee` plays a match, `League` does Elo, matchmaking and the hoodie trial, `Bots` finds the bots |
-| House bots | `src/Arena/House/`: The House (the hoodie gatekeeper), Rookie, Chaos Monkey |
+| Engine | `src/Arena/`: `Referee` plays a match, `League` does Elo, matchmaking and the trial, `Bots` finds the bots |
+| House bots | `src/Arena/House/`: The House (the trial opponent), Rookie, Chaos Monkey |
 | Pages | `/` (leaderboard, latest match), `/bot/{name}`, `/game/{id}`, `/merch`, `/tv` (plays `/arena/next` in a loop) |
 | Look | `assets/styles/app.css`, replays drawn by `assets/arena.js` |
 

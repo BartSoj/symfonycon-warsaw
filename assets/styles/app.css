@@ -39,7 +39,13 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 
 /* Home */
 .hero h1 { font-size: 1.9rem; }
-.steps { padding-left: 1.3rem; }
+.steps { padding-left: 1.3rem; margin: 6px 0 0; }
+.rewards { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 4px; }
+.rewards b { white-space: nowrap; }
+.how { margin: 6px 0 0; color: var(--muted); }
+.how summary { cursor: pointer; }
+.how p, .how li { color: var(--fg); }
+.how p { margin: 6px 0 0; }
 .steps li { margin: 4px 0; }
 
 /* Leaderboard */
@@ -65,6 +71,7 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 /* Bot page */
 .trial { border-width: 2px; }
 .trial.passed { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--card)); }
+.trial.tshirt { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); }
 .trial p { margin: 0 0 6px; }
 .trial-games { display: flex; gap: 14px; }
 .code { font: 13px/1.5 var(--mono); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; }
@@ -82,6 +89,7 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 .tv { display: grid; grid-template-columns: 300px 1fr 400px; gap: 28px; align-items: start; }
 .tv .qr { width: 100%; background: #fff; padding: 10px; border-radius: 12px; }
 .tv-pitch { font-size: 2rem; line-height: 1.15; margin: 14px 0 8px; }
+.tv .rewards { font-size: 1.05rem; }
 .tv-merch-title { margin: 20px 0 0; font-weight: 600; }
 .tv model-viewer { width: 100%; height: 260px; }
 .tv .arena { padding: 14px; }

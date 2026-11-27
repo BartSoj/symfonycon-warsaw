@@ -4,14 +4,13 @@ namespace App\Arena;
 
 /**
  * Plays one 1-on-1 match and returns the replay. The arena is 180° symmetric, so both sides are fair.
- * The seed decides where the walls are.
+ * The seed decides the size of the arena and where the walls are.
  */
 final class Referee
 {
-    public const WIDTH = 32;
-    public const HEIGHT = 20;
+    public const SIZES = [[28, 44], [18, 26]]; // width and height ranges
     public const MOVE_MS = 50;      // per move
-    public const MATCH_MS = 1500;   // per bot, for the whole match
+    public const MATCH_MS = 3000;   // per bot, for the whole match
 
     public function __construct(private Bots $bots)
     {
@@ -21,14 +20,16 @@ final class Referee
     public function play(string $keyA, string $keyB, int $seed): array
     {
         set_time_limit(60);
-        $w = self::WIDTH;
-        $h = self::HEIGHT;
-        $starts = [[6, 9, Direction::Right], [$w - 7, $h - 10, Direction::Left]];
+        $rng = new \Random\Randomizer(new \Random\Engine\Mt19937($seed));
+        $w = $rng->getInt(...self::SIZES[0]);
+        $h = $rng->getInt(...self::SIZES[1]);
+        $sx = intdiv($w, 5);
+        $sy = intdiv($h, 2) - 1;
+        $starts = [[$sx, $sy, Direction::Right], [$w - 1 - $sx, $h - 1 - $sy, Direction::Left]];
 
         // Walls, mirrored through the centre, never right in front of a start.
-        $rng = new \Random\Randomizer(new \Random\Engine\Mt19937($seed));
         $owner = [];
-        for ($i = 0, $n = $rng->getInt(0, 8); $i < $n; ++$i) {
+        for ($i = 0, $n = $rng->getInt(0, intdiv($w * $h, 80)); $i < $n; ++$i) {
             $vertical = 1 === $rng->getInt(0, 1);
             $x = $rng->getInt(0, $w - 1);
             $y = $rng->getInt(0, $h - 1);

@@ -25,6 +25,10 @@ class Game
     #[ORM\Column]
     public int $seed = 0;
 
+    /** How many ticks bot A stayed alive. */
+    #[ORM\Column(options: ['default' => 0])]
+    public int $survived = 0;
+
     /** A hoodie trial against The House: not counted on the leaderboard. */
     #[ORM\Column]
     public bool $trial = false;

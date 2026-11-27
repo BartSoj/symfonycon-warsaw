@@ -4,7 +4,6 @@
 //   data-board="/tv/board"               with data-loop: refreshes #tv-board after each match
 // A link with data-arena-next plays a fresh match in the first player on the page.
 
-const TICK_MS = 45;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const STEP = {U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0]};
@@ -61,10 +60,11 @@ async function play(view, game) {
         });
     };
 
+    const tickMs = Math.min(60, Math.max(20, 12000 / ticks)); // about 12 s per match, whatever the size
     for (let t = 0; t <= ticks; t++) {
         if (run !== view.run) return false;
         draw(t);
-        await sleep(t === 0 ? 600 : TICK_MS);
+        await sleep(t === 0 ? 600 : tickMs);
     }
     const crashes = players.filter(p => p.crash).map(p => `${esc(p.name)} ${esc(p.crash.reason)}`).join(' · ');
     view.result.innerHTML = winner === null

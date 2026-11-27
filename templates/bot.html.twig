@@ -8,13 +8,17 @@
     {% if bot.problem %}<div class="card warn">⚠️ {{ bot.problem }}</div>{% endif %}
 
     {% if trial %}
-        <div class="card trial {{ trial.passed ? 'passed' }}">
+        <div class="card trial {{ trial.passed ? 'passed' : (trial.tshirt ? 'tshirt') }}">
             {% if trial.passed %}
                 <p class="big">🧥 Hoodie earned!</p>
                 <p>{{ bot.name }} beat The House {{ trial.wins }} out of 3. Show this screen at the booth.</p>
+            {% elseif trial.tshirt %}
+                <p class="big">👕 T-shirt earned!</p>
+                <p>{{ bot.name }} won {{ trial.wins }}/3 and survived up to {{ trial.survived }} ticks. Show this screen at the booth.
+                    Win 2 of 3 for the hoodie: ask the agent to make it smarter, and every new version gets a new trial.</p>
             {% else %}
                 <p class="big">{{ trial.wins }}/3 against The House</p>
-                <p>You need 2 wins for the hoodie. Ask the agent to make it smarter: every new version gets a new trial.</p>
+                <p>It survived {{ trial.survived }} ticks at most. Survive {{ constant('App\\Arena\\League::SURVIVE') }} or win one match for a T-shirt, and win 2 for the hoodie.</p>
             {% endif %}
             <div class="trial-games">
                 {% for game in trial.games %}

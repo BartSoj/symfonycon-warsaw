@@ -2,14 +2,17 @@
 
 {% block body %}
     <section class="hero">
-        <h1>Build a bot. Beat The House. <span class="accent">Win a hoodie.</span> 🧥</h1>
-        <p>Light cycles leave a trail behind them, and touching a trail, a wall or the edge means you crash. The last one riding wins.
-            Ask the agent in <b>PhpStorm Air</b> at the booth to write your bot: one PHP class, live in a few minutes.</p>
-        <ol class="steps">
-            <li>Tell the agent your strategy and pick a name and colour.</li>
-            <li>It ships your bot, and it starts racing on the TV.</li>
-            <li>Beat <b>The House</b> in 2 of 3 trial matches and collect your hoodie at the booth.</li>
-        </ol>
+        <h1>Build a bot, <span class="accent">win merch.</span></h1>
+        {% include '_rewards.html.twig' %}
+        <details class="how">
+            <summary>How it works</summary>
+            <p>Light cycles leave a trail. Hit a trail, a wall or the edge and you crash; the last one riding wins.</p>
+            <ol class="steps">
+                <li>At the booth, tell the agent in <b>PhpStorm Air</b> your strategy, a bot name and a colour.</li>
+                <li>It ships your bot, which plays 3 trial matches against <b>The House</b> on the TV.</li>
+                <li>Find your bot in the leaderboard below and show its page at the booth.</li>
+            </ol>
+        </details>
     </section>
 
     {% if latest %}

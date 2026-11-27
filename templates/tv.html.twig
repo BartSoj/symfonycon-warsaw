@@ -7,8 +7,9 @@
     <div class="tv">
         <div class="tv-side">
             <img class="qr" src="{{ qr }}" alt="QR code to {{ url }}">
-            <p class="tv-pitch"><b>Build a bot.<br>Beat The House.<br><span class="accent">Win a hoodie.</span> 🧥</b></p>
-            <p class="muted">Scan, then tell the agent in PhpStorm Air your strategy.<br>{{ url }}</p>
+            <p class="tv-pitch"><b>Build a bot,<br><span class="accent">win merch.</span></b></p>
+            {% include '_rewards.html.twig' %}
+            <p class="muted">Tell the agent in PhpStorm Air your strategy. Scan to see your bot.</p>
             <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
             <p class="tv-merch-title">🎁 Also here: <span id="tv-merch-name">{{ merch[0].name }}</span></p>
             <model-viewer id="tv-merch" src="{{ merch[0].model }}" alt="JetBrains booth merch" auto-rotate auto-rotate-delay="0" rotation-per-second="40deg" shadow-intensity="1" tone-mapping="neutral" camera-orbit="{{ merch[0].orbit }}" min-camera-orbit="auto auto 30%"></model-viewer>
@@ -25,7 +26,7 @@
         <div class="tv-board">
             <h2>Leaderboard</h2>
             <div id="tv-board">{% include '_leaderboard.html.twig' with {rows: rows, compact: true} %}</div>
-            <p class="muted">🧥 = beat The House and won a hoodie</p>
+            <p class="muted">🧥 hoodie · 👕 T-shirt</p>
         </div>
     </div>
 {% endblock %}

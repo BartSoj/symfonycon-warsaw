@@ -3,9 +3,15 @@
 set -euo pipefail
 main=$(git -C "$(dirname "$0")/.." worktree list --porcelain | head -1 | cut -d' ' -f2)
 cd "$main"
-[ -d vendor ] || composer install -q --no-interaction
-php bin/console doctrine:schema:update --force -q
+# Always use the main checkout's own environment, never the caller's: bin/ship exports APP_ENV=dev for its
+# checks, and a real environment variable beats .env.local, so the prod cache would never be rebuilt.
 if grep -qs '^APP_ENV=prod' .env.local; then
-    php bin/console asset-map:compile -q
-    php bin/console cache:clear -q
+    export APP_ENV=prod APP_DEBUG=0
+else
+    export APP_ENV=dev APP_DEBUG=1
 fi
+[ -d vendor ] || composer install -q --no-interaction
+php bin/console cache:clear -q   # rebuilds the container, which is where new bots are found
+[ "$APP_ENV" = prod ] && php bin/console asset-map:compile -q
+php bin/console doctrine:schema:update --force -q
+echo "Live server ($APP_ENV) now has $(ls src/Bot/*.php 2>/dev/null | wc -l | tr -d ' ') visitor bots"

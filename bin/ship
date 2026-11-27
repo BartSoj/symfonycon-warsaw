@@ -13,7 +13,7 @@ else
     idea=${3:-}
 fi
 
-check() {
+check() (  # a subshell, so APP_ENV=dev doesn't leak into bin/deploy-local
     export APP_ENV=dev APP_DEBUG=1  # always check in dev, even where bin/serve set prod
     [ -d vendor ] || composer install -q --no-interaction
     php bin/console doctrine:schema:update --force -q
@@ -21,7 +21,7 @@ check() {
     php bin/console lint:twig templates -q
     php bin/console lint:yaml config data -q
     php bin/console app:check
-}
+)
 
 echo "== Checking every page"
 check

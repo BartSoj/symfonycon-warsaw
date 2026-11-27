@@ -15,7 +15,7 @@ final class TerritoryTyrantBot implements Bot
 {
     private float $spent = 0.0;
 
-    public function name(): string { return 'Territory Tyrant'; }
+    public function name(): string { return 'Plop'; }
     public function author(): string { return 'Booth Hero'; }
     public function color(): string { return '#ff6a00'; }
 

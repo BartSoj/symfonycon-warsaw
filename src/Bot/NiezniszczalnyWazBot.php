@@ -85,13 +85,14 @@ final class NiezniszczalnyWazBot implements Bot
                     }
                 }
 
+                $score = ($mine - $theirs) * 100;
                 if ($separated) {
                     // Venom mode: we're sealed off, so survive as long as possible and hug walls.
-                    $score = $area * 100 - $this->freeNeighbours($b, $w, $h, $nx, $ny) * 10;
+                    $score -= $this->freeNeighbours($b, $w, $h, $nx, $ny) * 10;
                 } else {
                     // Attack mode: win territory, then get close to its head to cut it off.
                     $dist = abs($nx - $opp->x) + abs($ny - $opp->y);
-                    $score = ($mine - $theirs) * 100 + $area * 5 - $dist * 3;
+                    $score += $area * 5 - $dist * 3;
                 }
 
                 if (isset($oppNext[$key])) {

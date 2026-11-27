@@ -1,17 +1,18 @@
-// The 5pm finale player (/finale). Plays a replay from Battle: every bot on one arena.
-// Start → 3-2-1 countdown → the battle, with live standings and a crash feed → podium.
+// The 5pm finale player (/finale, /finale/show). Plays one or more precomputed battles (Battle.php) back to back:
+// Start → 3-2-1 countdown → the battle with live standings and a crash feed → podium → next battle → all winners.
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
 const STEP = {U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0]};
+const BATTLE_MS = 45000; // a battle lasts about this long at 1×
+const PODIUM_MS = 7000;  // between battles
 
 const el = document.querySelector('[data-finale]');
 if (el) {
-    const {title, replay} = JSON.parse(el.dataset.finale);
-    const {w, h, walls, players, ticks, vanish} = replay;
+    const games = JSON.parse(el.dataset.finale);
     el.innerHTML = `
         <div class="finale-main">
-            <div class="finale-head"><h1>🏁 ${esc(title)}</h1><span class="finale-count"></span>
+            <div class="finale-head"><h1>🏁 <span class="finale-title"></span></h1><span class="finale-map muted"></span><span class="finale-count"></span>
                 <span class="finale-controls">
                     <button class="btn" data-start>▶ Start</button>
                     <button class="btn btn-outline" data-speed="0.5">½×</button><button class="btn btn-outline on" data-speed="1">1×</button><button class="btn btn-outline" data-speed="2">2×</button><button class="btn btn-outline" data-speed="4">4×</button>
@@ -20,28 +21,37 @@ if (el) {
             <div class="finale-stage"><canvas></canvas><div class="finale-overlay"></div></div>
         </div>
         <aside class="finale-side"><ol class="finale-standings"></ol><div class="finale-feed"></div></aside>`;
-    const canvas = el.querySelector('canvas'), ctx = canvas.getContext('2d');
-    const overlay = el.querySelector('.finale-overlay'), standings = el.querySelector('.finale-standings');
-    const feed = el.querySelector('.finale-feed'), count = el.querySelector('.finale-count');
+    const $ = s => el.querySelector(s);
+    const canvas = $('canvas'), ctx = canvas.getContext('2d'), overlay = $('.finale-overlay');
+    let g, cell = 10, speed = 1, run = 0;
 
-    const paths = players.map(p => {
-        const pts = [[p.x, p.y]];
-        for (const m of p.moves) { const [x, y] = pts.at(-1); pts.push([x + STEP[m][0], y + STEP[m][1]]); }
-        return pts;
-    });
-    const crashes = players.map((p, i) => ({...p, i})).filter(p => p.crash).sort((a, b) => a.crash.tick - b.crash.tick);
-    let cell = 10;
+    const load = i => {
+        const {title, replay} = games[i];
+        const paths = replay.players.map(p => {
+            const pts = [[p.x, p.y]];
+            for (const m of p.moves) { const [x, y] = pts.at(-1); pts.push([x + STEP[m][0], y + STEP[m][1]]); }
+            return pts;
+        });
+        const crashes = replay.players.filter(p => p.crash).sort((a, b) => a.crash.tick - b.crash.tick);
+        g = {...replay, title, paths, crashes, index: i};
+        $('.finale-title').textContent = title;
+        $('.finale-map').textContent = (games.length > 1 ? `Battle ${i + 1} of ${games.length} · ` : '') + (replay.options?.label ?? '') + ` · ${replay.w}×${replay.h}`;
+        size(); draw(0); side(0);
+    };
 
     const size = () => {
-        const stage = el.querySelector('.finale-stage');
-        cell = Math.max(4, Math.floor(Math.min(stage.clientWidth / w, (innerHeight - stage.getBoundingClientRect().top - 16) / h)));
+        const stage = $('.finale-stage');
+        cell = Math.max(3, Math.floor(Math.min(stage.parentElement.clientWidth / g.w, (innerHeight - stage.getBoundingClientRect().top - 16) / g.h)));
         const dpr = devicePixelRatio || 1;
-        canvas.width = w * cell * dpr; canvas.height = h * cell * dpr;
-        canvas.style.width = w * cell + 'px'; canvas.style.height = h * cell + 'px';
+        canvas.width = g.w * cell * dpr; canvas.height = g.h * cell * dpr;
+        canvas.style.width = g.w * cell + 'px'; canvas.style.height = g.h * cell + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
+    const alive = t => g.players.filter(p => !p.crash || p.crash.tick > t);
+
     const draw = t => {
+        const {w, h} = g;
         ctx.fillStyle = '#0d0e12';
         ctx.fillRect(0, 0, w * cell, h * cell);
         if (cell >= 8) {
@@ -51,12 +61,12 @@ if (el) {
             ctx.stroke();
         }
         ctx.fillStyle = '#5a5f6e';
-        for (const [x, y] of walls) ctx.fillRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
+        for (const [x, y] of g.walls) ctx.fillRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
         const pad = cell >= 8 ? 2 : 1;
-        players.forEach((p, i) => {
+        g.players.forEach((p, i) => {
             const dead = p.crash && t >= p.crash.tick;
-            if (dead && vanish && t > p.crash.tick + 6) return;
-            const pts = paths[i].slice(0, t + 1);
+            if (dead && g.vanish && t > p.crash.tick + 6) return;
+            const pts = g.paths[i].slice(0, t + 1);
             ctx.globalAlpha = dead ? .3 : .85; ctx.fillStyle = p.color;
             for (const [x, y] of pts) ctx.fillRect(x * cell + pad, y * cell + pad, cell - 2 * pad, cell - 2 * pad);
             ctx.globalAlpha = 1;
@@ -79,60 +89,79 @@ if (el) {
     };
 
     const side = t => {
-        const alive = players.filter(p => !p.crash || p.crash.tick > t);
-        const out = crashes.filter(p => p.crash.tick <= t).reverse();
-        count.textContent = `${alive.length} of ${players.length} still riding`;
-        standings.innerHTML = alive.map(p => `<li class="alive"><span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></li>`).join('')
+        const live = alive(t), out = g.crashes.filter(p => p.crash.tick <= t).reverse();
+        $('.finale-count').textContent = `${live.length} of ${g.players.length} still riding`;
+        $('.finale-standings').innerHTML = live.map(p => `<li class="alive"><span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></li>`).join('')
             + out.map(p => `<li class="out"><span class="place">${p.place}.</span><span class="swatch" style="background:${esc(p.color)}"></span>${esc(p.name)}</li>`).join('');
-        feed.innerHTML = out.slice(0, 6).map(p => `<div>💥 <b style="color:${esc(p.color)}">${esc(p.name)}</b> ${esc(p.crash.reason)}</div>`).join('');
+        $('.finale-feed').innerHTML = out.slice(0, 6).map(p => `<div>💥 <b style="color:${esc(p.color)}">${esc(p.name)}</b> ${esc(p.crash.reason)}</div>`).join('');
     };
 
-    let speed = 1, run = 0;
-    const play = async () => {
-        const me = ++run;
-        overlay.innerHTML = ''; overlay.className = 'finale-overlay';
-        draw(0); side(0);
+    const podium = () => [...g.players].sort((a, b) => a.place - b.place).slice(0, 3);
+    const show = html => { overlay.className = 'finale-overlay show'; overlay.innerHTML = html; };
+
+    const battle = async me => {
+        overlay.className = 'finale-overlay'; overlay.innerHTML = '';
         for (const n of ['3', '2', '1', 'GO!']) {
             overlay.innerHTML = `<div class="countdown">${n}</div>`;
             await sleep(900);
-            if (me !== run) return;
+            if (me !== run) return false;
         }
         overlay.innerHTML = '';
-        const base = Math.min(150, Math.max(35, 45000 / ticks)); // about 45 s at 1×
-        for (let t = 0; t <= ticks; t++) {
-            if (me !== run) return;
+        const base = Math.min(150, Math.max(25, BATTLE_MS / g.ticks));
+        for (let t = 0; t <= g.ticks; t++) {
+            if (me !== run) return false;
             draw(t);
-            if (t % 3 === 0 || crashes.some(p => p.crash.tick === t)) side(t);
-            await sleep(base / speed);
+            if (t % 3 === 0 || g.crashes.some(p => p.crash.tick === t)) side(t);
+            await sleep(base / speed / (alive(t).length <= 2 ? 2.5 : 1)); // the final duel goes faster
         }
-        side(ticks);
-        const podium = [...players].sort((a, b) => a.place - b.place).slice(0, 3);
-        overlay.className = 'finale-overlay show';
-        overlay.innerHTML = `<div class="podium"><div class="winner">🏆 ${esc(podium[0].name)}</div><div class="muted">by ${esc(podium[0].author)}</div>
-            <ol>${podium.map(p => `<li><span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></li>`).join('')}</ol></div>`;
+        side(g.ticks);
+        return true;
     };
 
-    size(); draw(0); side(0);
+    const start = async () => {
+        const me = ++run, winners = [];
+        for (let i = 0; i < games.length; i++) {
+            load(i);
+            if (!await battle(me)) return;
+            const top = podium();
+            winners.push({...top[0], map: g.options?.label});
+            const next = i < games.length - 1 ? `<p class="muted">Next battle in a few seconds…</p>` : '';
+            show(`<div class="podium"><div class="winner">🏆 ${esc(top[0].name)}</div><div class="muted">by ${esc(top[0].author)}</div>
+                <ol>${top.map(p => `<li><span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></li>`).join('')}</ol>${next}</div>`);
+            if (next) { await sleep(PODIUM_MS); if (me !== run) return; }
+        }
+        if (games.length > 1) {
+            await sleep(PODIUM_MS);
+            if (me !== run) return;
+            show(`<div class="podium"><div class="winner">🏁 The winners</div><ol class="winners">${winners.map(p => `<li><span class="muted">${esc(p.map ?? '')}</span> <span class="swatch" style="background:${esc(p.color)}"></span><b>${esc(p.name)}</b> <span class="muted">${esc(p.author)}</span></li>`).join('')}</ol></div>`);
+        }
+    };
+
+    load(0);
     addEventListener('resize', () => { size(); draw(0); });
-    el.querySelector('[data-start]').addEventListener('click', play);
+    $('[data-start]').addEventListener('click', start);
     for (const b of el.querySelectorAll('[data-speed]')) {
         b.addEventListener('click', () => {
             speed = +b.dataset.speed;
             el.querySelectorAll('[data-speed]').forEach(x => x.classList.toggle('on', x === b));
         });
     }
-    if (el.dataset.autostart === '1') play();
+    if (el.dataset.autostart === '1') start();
 }
 
-// After "Compute a new finale": wait for it, then open it.
+// After "Compute": wait until the newest finale is done, then open it (or the staff list, for a batch).
 const wait = document.querySelector('[data-finale-wait]');
 if (wait) {
     (async () => {
         for (;;) {
             await sleep(1500);
             const s = await (await fetch('/finale/latest.json')).json();
-            if (s.id && s.id > +wait.dataset.finaleWait) { location.href = '/finale/' + s.id; return; }
-            if (!s.running) { wait.textContent = '⚠️ Computing stopped without a result: see var/log/finale.log'; return; }
+            if (!s.running) {
+                if (s.id && s.id > +wait.dataset.finaleWait) { location.href = '/finale/' + s.id; return; }
+                wait.textContent = '⚠️ Computing stopped without a result: see var/log/finale.log';
+                return;
+            }
+            if (s.id > +wait.dataset.finaleWait) wait.textContent = `⏳ Computing… #${s.id} is done, more to come.`;
         }
     })();
 }

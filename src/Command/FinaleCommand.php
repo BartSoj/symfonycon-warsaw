@@ -12,7 +12,10 @@ use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-/** Computes a finale and saves it; /finale plays the newest one. The staff form on /finale runs this in the background. */
+/**
+ * Computes finales and saves them; /finale plays them. The staff form on /finale runs this in the background.
+ * --map picks a preset from Battle::MAPS (--all-maps: one battle per preset); --map=custom uses the other options.
+ */
 #[AsCommand('app:finale', 'Put every bot on one arena at once and save the replay for /finale')]
 class FinaleCommand
 {
@@ -22,14 +25,16 @@ class FinaleCommand
 
     public function __invoke(
         SymfonyStyle $io,
+        #[Option('A preset from Battle::MAPS, or custom')] string $map = 'open',
+        #[Option('One battle on every preset map')] bool $allMaps = false,
         #[Option('all: every visitor bot; arena: only bots in the arena; or a comma-separated list of class names')] string $bots = 'all',
         #[Option('Also add The House')] bool $house = false,
-        #[Option('Size like 80x50 (automatic if empty)')] string $size = '',
-        #[Option('Free cells per bot, for the automatic size')] int $cells = 360,
-        #[Option('Number of random wall segments')] int $walls = 0,
-        #[Option('ring, center or random')] string $start = 'ring',
+        #[Option('custom: size like 80x50 (automatic if empty)')] string $size = '',
+        #[Option('custom: free cells per bot, for the automatic size')] int $cells = 360,
+        #[Option('custom: wall layout (open, pillars, rooms, rings, cross)')] string $layout = 'open',
+        #[Option('custom: number of random wall segments')] int $walls = 0,
+        #[Option('custom: ring, center or random')] string $start = 'ring',
         #[Option('Trails of crashed bots disappear')] bool $vanish = false,
-        #[Option('Thinking time per move, in ms')] int $moveMs = 100,
         #[Option('Random if 0')] int $seed = 0,
         #[Option('Shown above the arena')] string $title = 'The Grand Finale',
     ): int {
@@ -49,24 +54,32 @@ class FinaleCommand
                 return 1;
             }
             [$w, $h] = array_map('intval', explode('x', $size.'x'));
-            $seed = $seed ?: random_int(1, 2 ** 31 - 1);
-            $t = microtime(true);
-            $replay = $this->battle->play($keys, $seed, ['w' => $w ?: null, 'h' => $h ?: null, 'cells' => $cells, 'walls' => $walls, 'start' => $start, 'vanish' => $vanish, 'moveMs' => $moveMs]);
+            $custom = ['map' => $layout, 'w' => $w ?: null, 'h' => $h ?: null, 'cells' => $cells, 'walls' => $walls, 'start' => $start];
 
-            $finale = new Finale();
-            $finale->title = $title;
-            $finale->seed = $seed;
-            $finale->createdAt = new \DateTimeImmutable();
-            $finale->seconds = round(microtime(true) - $t, 1);
-            $finale->replay = $replay;
-            $this->em->persist($finale);
-            $this->em->flush();
+            foreach ($allMaps ? array_keys(Battle::MAPS) : [$map] as $preset) {
+                $options = (Battle::MAPS[$preset] ?? $custom) + ['vanish' => $vanish];
+                if ($vanish) {
+                    $options['vanish'] = true;
+                }
+                $s = $seed ?: random_int(1, 2 ** 31 - 1);
+                $t = microtime(true);
+                $replay = $this->battle->play($keys, $s, $options);
 
-            $players = $replay['players'];
-            usort($players, fn ($a, $b) => $a['place'] <=> $b['place']);
-            $io->writeln(\sprintf('Finale #%d: %d bots on %dx%d, %d ticks, computed in %.1f s', $finale->id, \count($keys), $replay['w'], $replay['h'], $replay['ticks'], $finale->seconds));
-            foreach ($players as $pl) {
-                $io->writeln(\sprintf('  %2d. %-22s %-14s %6d ms  %s', $pl['place'], $pl['name'], $pl['author'], $pl['ms'], $pl['crash'] ? "tick {$pl['crash']['tick']}: {$pl['crash']['reason']}" : 'survived'));
+                $finale = new Finale();
+                $finale->title = $title;
+                $finale->seed = $s;
+                $finale->createdAt = new \DateTimeImmutable();
+                $finale->seconds = round(microtime(true) - $t, 1);
+                $finale->replay = $replay;
+                $this->em->persist($finale);
+                $this->em->flush();
+
+                $players = $replay['players'];
+                usort($players, fn ($a, $b) => $a['place'] <=> $b['place']);
+                $io->writeln(\sprintf('Finale #%d "%s": %d bots on %dx%d, %d walls, %d ticks, computed in %.1f s', $finale->id, $replay['options']['label'], \count($keys), $replay['w'], $replay['h'], \count($replay['walls']), $replay['ticks'], $finale->seconds));
+                foreach ($io->isVerbose() || !$allMaps ? $players : [] as $pl) {
+                    $io->writeln(\sprintf('  %2d. %-22s %-14s %6d ms  %s', $pl['place'], $pl['name'], $pl['author'], $pl['ms'], $pl['crash'] ? "tick {$pl['crash']['tick']}: {$pl['crash']['reason']}" : 'survived'));
+                }
             }
 
             return 0;

@@ -8,10 +8,25 @@ namespace App\Arena;
  */
 final class Battle
 {
+    /** Map presets for the finale. Any DEFAULTS key can be set; staff pick one on /finale or with --map. */
+    public const MAPS = [
+        'open' => ['label' => 'Open field'],
+        'pillars' => ['label' => 'Pillars', 'map' => 'pillars', 'cells' => 400],
+        'rooms' => ['label' => 'Four rooms', 'map' => 'rooms', 'cells' => 400],
+        'rings' => ['label' => 'Rings', 'map' => 'rings', 'cells' => 440],
+        'cross' => ['label' => 'The cross', 'map' => 'cross', 'cells' => 380],
+        'debris' => ['label' => 'Debris', 'walls' => -1, 'cells' => 420],
+        'tight' => ['label' => 'Tight squeeze', 'cells' => 170, 'start' => 'center'],
+        'huge' => ['label' => 'Huge', 'map' => 'pillars', 'cells' => 900],
+        'ghost' => ['label' => 'Ghost trails', 'cells' => 260, 'vanish' => true, 'start' => 'random'],
+    ];
+
     public const DEFAULTS = [
+        'label' => 'Custom',
+        'map' => 'open',     // wall layout: open, pillars, rooms, rings, cross
         'cells' => 360,      // free cells per bot when the size is automatic
         'w' => null, 'h' => null,
-        'walls' => 0,        // number of random wall segments
+        'walls' => 0,        // random wall segments on top of the layout; -1 = a lot
         'start' => 'ring',   // ring: spread on a ring riding clockwise; center: all facing the middle; random
         'vanish' => false,   // trails of crashed bots disappear
         'moveMs' => 100,     // per move
@@ -52,24 +67,27 @@ final class Battle
             $starts[] = [$x, $y, $d];
         }
 
-        $owner = [];
-        for ($i = 0; $i < $o['walls']; ++$i) {
+        // Walls: the map's layout plus random segments, but never right next to or in front of a start.
+        $cells = $this->layout($o['map'], $w, $h);
+        for ($i = 0, $n = $o['walls'] < 0 ? (int) round($w * $h / 70) : $o['walls']; $i < $n; ++$i) {
             $vertical = 1 === $rng->getInt(0, 1);
             $x = $rng->getInt(0, $w - 1);
             $y = $rng->getInt(0, $h - 1);
             for ($k = 0, $len = $rng->getInt(2, 7); $k < $len; ++$k) {
-                $px = $x + ($vertical ? 0 : $k);
-                $py = $y + ($vertical ? $k : 0);
-                if ($px >= $w || $py >= $h) {
-                    continue;
-                }
-                foreach ($starts as [$sx, $sy, $sd]) {
-                    if (abs($px - $sx) + abs($py - $sy) <= 4 || ($sd->dx() ? $py === $sy && ($px - $sx) * $sd->dx() > 0 && abs($px - $sx) <= 8 : $px === $sx && ($py - $sy) * $sd->dy() > 0 && abs($py - $sy) <= 8)) {
-                        continue 2;
-                    }
-                }
-                $owner[$py * $w + $px] = 'wall';
+                $cells[] = [$x + ($vertical ? 0 : $k), $y + ($vertical ? $k : 0)];
             }
+        }
+        $owner = [];
+        foreach ($cells as [$px, $py]) {
+            if ($px < 0 || $py < 0 || $px >= $w || $py >= $h) {
+                continue;
+            }
+            foreach ($starts as [$sx, $sy, $sd]) {
+                if (abs($px - $sx) + abs($py - $sy) <= 4 || ($sd->dx() ? $py === $sy && ($px - $sx) * $sd->dx() > 0 && abs($px - $sx) <= 8 : $px === $sx && ($py - $sy) * $sd->dy() > 0 && abs($py - $sy) <= 8)) {
+                    continue 2;
+                }
+            }
+            $owner[$py * $w + $px] = 'wall';
         }
         $walls = array_map(fn ($i) => [$i % $w, intdiv($i, $w)], array_keys($owner));
 
@@ -165,5 +183,65 @@ final class Battle
         }
 
         return ['w' => $w, 'h' => $h, 'walls' => $walls, 'players' => $players, 'winner' => 1 === \count($alive) ? $alive[0] : null, 'ticks' => $tick, 'vanish' => (bool) $o['vanish'], 'options' => $o];
+    }
+
+    /** @return list<array{int, int}> wall cells of a layout */
+    private function layout(string $map, int $w, int $h): array
+    {
+        $cells = [];
+        $line = function (int $x1, int $y1, int $x2, int $y2, array $gaps = [], int $gap = 3) use (&$cells) {
+            for ($x = $x1, $y = $y1; ; $x += $x2 <=> $x1, $y += $y2 <=> $y1) {
+                $along = $x1 === $x2 ? $y : $x;
+                if (!array_filter($gaps, fn ($g) => abs($along - $g) <= $gap)) {
+                    $cells[] = [$x, $y];
+                }
+                if ($x === $x2 && $y === $y2) {
+                    break;
+                }
+            }
+        };
+        $cx = intdiv($w, 2);
+        $cy = intdiv($h, 2);
+        switch ($map) {
+            case 'pillars':
+                $step = max(7, intdiv($w, 9));
+                for ($x = intdiv($step, 2); $x < $w - 2; $x += $step) {
+                    for ($y = intdiv($step, 2); $y < $h - 2; $y += $step) {
+                        array_push($cells, [$x, $y], [$x + 1, $y], [$x, $y + 1], [$x + 1, $y + 1]);
+                    }
+                }
+                break;
+            case 'rooms':
+                $line($cx, 0, $cx, $h - 1, [intdiv($h, 4), intdiv(3 * $h, 4)]);
+                $line(0, $cy, $w - 1, $cy, [intdiv($w, 4), intdiv(3 * $w, 4)]);
+                break;
+            case 'rings':
+                // Outer ring with doors in the middle of each side, inner ring with doors at the quarters.
+                foreach ([[.2, false], [.35, true]] as [$f, $quarters]) {
+                    $x1 = (int) round($w * $f);
+                    $y1 = (int) round($h * $f);
+                    $x2 = $w - 1 - $x1;
+                    $y2 = $h - 1 - $y1;
+                    $gx = $quarters ? [$x1 + intdiv($x2 - $x1, 4), $x2 - intdiv($x2 - $x1, 4)] : [$cx];
+                    $gy = $quarters ? [$y1 + intdiv($y2 - $y1, 4), $y2 - intdiv($y2 - $y1, 4)] : [$cy];
+                    $line($x1, $y1, $x2, $y1, $gx);
+                    $line($x1, $y2, $x2, $y2, $gx);
+                    $line($x1, $y1, $x1, $y2, $gy);
+                    $line($x2, $y1, $x2, $y2, $gy);
+                }
+                break;
+            case 'cross':
+                $line($cx - intdiv($w, 5), $cy, $cx + intdiv($w, 5), $cy);
+                $line($cx, $cy - intdiv($h, 4), $cx, $cy + intdiv($h, 4));
+                foreach ([[1, 1], [1, -1], [-1, 1], [-1, -1]] as [$sx, $sy]) {
+                    $x = $cx + $sx * intdiv($w, 3);
+                    $y = $cy + $sy * intdiv($h, 3);
+                    $line($x, $y, $x - $sx * intdiv($w, 10), $y);
+                    $line($x, $y, $x, $y - $sy * intdiv($h, 8));
+                }
+                break;
+        }
+
+        return $cells;
     }
 }

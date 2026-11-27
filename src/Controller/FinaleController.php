@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Arena\Battle;
 use App\Entity\Finale;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,10 +24,34 @@ class FinaleController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        return $this->page($em, $finale ? [$finale] : []);
+    }
+
+    /** Plays several precomputed finales back to back: /finale/show?ids[]=3&ids[]=7 */
+    #[Route('/finale/show', name: 'finale_playlist')]
+    public function playlist(EntityManagerInterface $em, Request $request): Response
+    {
+        $ids = array_map('intval', $request->query->all('ids'));
+        $found = $ids ? $em->getRepository(Finale::class)->findBy(['id' => $ids]) : [];
+        usort($found, fn ($a, $b) => array_search($a->id, $ids, true) <=> array_search($b->id, $ids, true));
+
+        return $this->page($em, $found);
+    }
+
+    /** @param list<Finale> $finales */
+    private function page(EntityManagerInterface $em, array $finales): Response
+    {
+        $history = [];
+        foreach ($em->getRepository(Finale::class)->findBy([], ['id' => 'DESC'], 40) as $f) {
+            $history[] = ['id' => $f->id, 'title' => $f->title, 'at' => $f->createdAt, 'seconds' => $f->seconds, 'label' => $f->replay['options']['label'] ?? 'Custom',
+                'size' => $f->replay['w'].'×'.$f->replay['h'], 'bots' => \count($f->replay['players']), 'ticks' => $f->replay['ticks'], 'walls' => \count($f->replay['walls'])];
+        }
+
         return $this->render('finale.html.twig', [
-            'finale' => $finale,
+            'finales' => array_map(fn (Finale $f) => ['id' => $f->id, 'title' => $f->title, 'replay' => $f->replay], $finales),
             'running' => $this->running(),
-            'history' => $em->createQuery('SELECT f.id, f.title, f.createdAt, f.seconds FROM App\Entity\Finale f ORDER BY f.id DESC')->setMaxResults(15)->getArrayResult(),
+            'maps' => Battle::MAPS,
+            'history' => $history,
         ]);
     }
 
@@ -44,7 +69,10 @@ class FinaleController extends AbstractController
     {
         if (!$this->running()) {
             $r = $request->request;
+            $map = $r->get('all') ? null : (isset(Battle::MAPS[$r->get('map')]) ? $r->get('map') : 'custom');
             $args = [
+                $map ? '--map='.$map : '--all-maps',
+                '--layout='.(\in_array($r->get('layout'), ['open', 'pillars', 'rooms', 'rings', 'cross'], true) ? $r->get('layout') : 'open'),
                 '--bots='.($r->get('bots') === 'arena' ? 'arena' : 'all'),
                 '--start='.(\in_array($r->get('start'), ['ring', 'center', 'random'], true) ? $r->get('start') : 'ring'),
                 '--walls='.max(0, min(60, $r->getInt('walls'))),

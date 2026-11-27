@@ -1,34 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ finale.title ?? 'The Grand Finale' }} · Bot Arena{% endblock %}
+{% block title %}The Grand Finale · Bot Arena{% endblock %}
 {% block body_class %}tv-page finale-page{% endblock %}
 {% block javascripts %}{{ importmap(['app', 'finale']) }}{% endblock %}
 
 {% block body %}
-    {% if finale %}
-        <div class="finale" data-finale="{{ {id: finale.id, title: finale.title, replay: finale.replay}|json_encode }}" data-autostart="{{ app.request.query.get('autostart') ? 1 : 0 }}"></div>
+    {% if finales %}
+        <div class="finale" data-finale="{{ finales|json_encode }}" data-autostart="{{ app.request.query.get('autostart') ? 1 : 0 }}"></div>
     {% else %}
-        <div class="finale-empty"><h1>🏁 The Grand Finale</h1><p class="muted">Every bot on one arena, at 5pm. Nothing computed yet.</p></div>
+        <div class="finale-empty"><h1>🏁 The Grand Finale</h1><p class="muted">Every bot on one arena at 5pm. Nothing to play yet.</p></div>
     {% endif %}
     {% if running or app.request.query.get('wait') %}
-        <p class="finale-wait" data-finale-wait="{{ finale.id ?? 0 }}">⏳ Computing a new finale…</p>
+        <p class="finale-wait" data-finale-wait="{{ history[0].id ?? 0 }}">⏳ Computing… this page opens the result when it's ready.</p>
     {% endif %}
 
-    <details class="finale-staff">
+    <details class="finale-staff"{{ finales ? '' : ' open' }}>
         <summary>Staff</summary>
         <form method="post" action="{{ path('finale_run') }}" class="finale-form">
-            <label>Title <input name="title" value="The Grand Finale"></label>
+            <label>Map <select name="map">
+                {% for key, m in maps %}<option value="{{ key }}">{{ m.label }}</option>{% endfor %}
+                <option value="custom">Custom (the settings below)</option>
+            </select></label>
             <label>Bots <select name="bots"><option value="all">All visitor bots</option><option value="arena">Only bots in the arena</option></select></label>
-            <label>Start <select name="start"><option value="ring">Ring, riding clockwise</option><option value="center">Everyone faces the middle</option><option value="random">Random directions</option></select></label>
-            <label>Room per bot <input name="cells" type="number" value="360" min="80" max="2000"> cells</label>
-            <label>Walls <input name="walls" type="number" value="0" min="0" max="60"></label>
-            <label><input type="checkbox" name="vanish" value="1"> Trails vanish when a bot crashes</label>
             <label><input type="checkbox" name="house" value="1"> Add The House</label>
-            <button class="btn"{{ running ? ' disabled' }}>Compute a new finale</button>
+            <label><input type="checkbox" name="vanish" value="1"> Trails vanish when a bot crashes</label>
+            <fieldset><legend class="muted">Custom</legend>
+                <label>Layout <select name="layout"><option>open</option><option>pillars</option><option>rooms</option><option>rings</option><option>cross</option></select></label>
+                <label>Start <select name="start"><option value="ring">Ring, riding clockwise</option><option value="center">Everyone faces the middle</option><option value="random">Random directions</option></select></label>
+                <label>Room per bot <input name="cells" type="number" value="360" min="80" max="2000"> cells</label>
+                <label>Random walls <input name="walls" type="number" value="0" min="0" max="60"></label>
+            </fieldset>
+            <label>Title <input name="title" value="The Grand Finale"></label>
+            <div class="row">
+                <button class="btn"{{ running ? ' disabled' }}>Compute one</button>
+                <button class="btn btn-outline" name="all" value="1"{{ running ? ' disabled' }}>Compute every map ({{ maps|length }}, about a minute)</button>
+            </div>
         </form>
-        <p class="muted">Computing takes a few seconds; this page loads it when it's ready. Then press Start.</p>
-        {% for f in history %}
-            <a href="{{ path('finale_show', {id: f.id}) }}">#{{ f.id }} {{ f.title }}</a> <span class="muted">{{ f.createdAt|date('H:i') }} · {{ f.seconds }} s</span><br>
-        {% endfor %}
+
+        {% if history %}
+            <form method="get" action="{{ path('finale_playlist') }}">
+                <p class="muted">Winners aren't shown here, so you can pick battles without spoilers. Tick some and play them back to back.</p>
+                <table class="finale-history">
+                    <tr><th></th><th>#</th><th>Map</th><th>Size</th><th>Walls</th><th>Bots</th><th>Ticks</th><th>Made</th><th></th></tr>
+                    {% for f in history %}
+                        <tr>
+                            <td><input type="checkbox" name="ids[]" value="{{ f.id }}"></td>
+                            <td>{{ f.id }}</td><td>{{ f.label }}</td><td>{{ f.size }}</td><td>{{ f.walls }}</td><td>{{ f.bots }}</td><td>{{ f.ticks }}</td>
+                            <td class="muted">{{ f.at|date('H:i') }} · {{ f.seconds }} s</td>
+                            <td><a href="{{ path('finale_show', {id: f.id}) }}">watch</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <button class="btn">▶ Play the ticked ones as a show</button>
+            </form>
+        {% endif %}
     </details>
 {% endblock %}

@@ -178,6 +178,25 @@ final class Battle
         return ['w' => $w, 'h' => $h, 'walls' => $walls, 'players' => $players, 'winner' => 1 === \count($alive) ? $alive[0] : null, 'ticks' => $tick, 'vanish' => (bool) $o['vanish'], 'options' => $o];
     }
 
+    /**
+     * How fun a battle is to watch, 0–100: mostly the share of crashes caused by other bots (their trail or a
+     * head-on) instead of the bot's own trail or a wall, minus a long lonely end once only 2 are left.
+     */
+    public static function interest(array $replay): int
+    {
+        $crashes = array_values(array_filter(array_column($replay['players'], 'crash')));
+        if (!$crashes) {
+            return 0;
+        }
+        $fights = \count(array_filter($crashes, fn ($c) => null !== ($c['by'] ?? null) || str_contains($c['reason'], 'head-on')));
+        $ticks = array_column($crashes, 'tick');
+        sort($ticks);
+        $two = $ticks[\count($replay['players']) - 3] ?? 0; // when only 2 were left
+        $tail = $replay['ticks'] ? ($replay['ticks'] - $two) / $replay['ticks'] : 0;
+
+        return (int) round(100 * ($fights / \count($crashes)) - 30 * $tail);
+    }
+
     /** @return list<array{int, int, Direction}> starts spread on an ellipse */
     private function ring(int $n, int $w, int $h, string $start, \Random\Randomizer $rng): array
     {

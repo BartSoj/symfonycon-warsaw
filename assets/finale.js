@@ -20,10 +20,13 @@ if (el) {
             </div>
             <div class="finale-stage"><canvas></canvas><div class="finale-overlay"></div></div>
         </div>
-        <aside class="finale-side"><ol class="finale-standings"></ol><div class="finale-feed"></div></aside>`;
+        <aside class="finale-side"><ol class="finale-standings"></ol><div class="finale-feed"></div></aside>
+        <div class="finale-scores" hidden></div>`;
     const $ = s => el.querySelector(s);
+    const liveAt = el.dataset.liveAt;
+    if (liveAt) $('.finale-controls').remove();
     const canvas = $('canvas'), ctx = canvas.getContext('2d'), overlay = $('.finale-overlay');
-    let g, cell = 10, speed = 1, run = 0;
+    let g, cell = 10, speed = 1, run = 0, shown = 0;
 
     const load = i => {
         const {title, replay} = games[i];
@@ -51,6 +54,7 @@ if (el) {
     const alive = t => g.players.filter(p => !p.crash || p.crash.tick > t);
 
     const draw = t => {
+        shown = t;
         const {w, h} = g;
         ctx.fillStyle = '#0d0e12';
         ctx.fillRect(0, 0, w * cell, h * cell);
@@ -137,9 +141,61 @@ if (el) {
         }
     };
 
+    // /finale/live: count down to the start time, play in sync with the server clock, then everyone's place.
+    const clockText = s => { const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, ss = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`; };
+    const scoreboard = () => {
+        const rows = [...g.players].sort((a, b) => a.place - b.place || a.name.localeCompare(b.name));
+        const medal = p => ['🥇', '🥈', '🥉'][p.place - 1] ?? `${p.place}.`;
+        const board = $('.finale-scores');
+        board.innerHTML = `<h1>🏁 ${esc(g.title)}: final standings</h1>
+            <ol class="finale-scores-list">${rows.map(p => `<li class="${p.place <= 3 ? 'top' : ''}"><span class="place">${medal(p)}</span><span class="swatch big" style="background:${esc(p.color)}"></span>
+                <span class="who"><b>${esc(p.name)}</b> <span class="muted">by ${esc(p.author)}</span></span>
+                <span class="how muted">${p.crash ? esc(p.crash.reason) : '🏆 last one riding'}</span></li>`).join('')}</ol>`;
+        board.style.setProperty('--rows', Math.ceil(rows.length / 2));
+        board.hidden = false;
+    };
+    const live = async () => {
+        const at = Date.parse(liveAt), skew = +el.dataset.now * 1000 - Date.now(), now = () => Date.now() + skew;
+        const base = Math.min(150, Math.max(25, BATTLE_MS / g.ticks)), times = [0];
+        for (let t = 0; t < g.ticks; t++) times.push(times[t] + base / (alive(t).length <= 2 ? 2.5 : 1)); // same pace as battle()
+        const end = times[g.ticks], clock = $('.finale-count');
+        $('.finale-map').textContent = `${g.players.length} bots · starts at ${el.dataset.liveLabel}`;
+        while (now() < at - 3000) {
+            clock.textContent = 'starts in ' + clockText(Math.ceil((at - now()) / 1000));
+            await sleep(1005 - now() % 1000);
+        }
+        while (now() < at) {
+            show(`<div class="countdown">${Math.ceil((at - now()) / 1000)}</div>`);
+            await sleep(100);
+        }
+        $('.finale-map').textContent = `${g.players.length} bots`;
+        if (now() - at < 1500) {
+            show('<div class="countdown">GO!</div>');
+            setTimeout(() => { overlay.className = 'finale-overlay'; overlay.innerHTML = ''; }, 900);
+        } else {
+            overlay.className = 'finale-overlay'; overlay.innerHTML = '';
+        }
+        let t = 0;
+        while (now() - at < end) {
+            const e = now() - at;
+            while (t < g.ticks && times[t + 1] <= e) t++;
+            draw(t); side(t);
+            await sleep(Math.max(5, times[t + 1] - e));
+        }
+        draw(g.ticks); side(g.ticks);
+        const left = end + PODIUM_MS - (now() - at);
+        if (left > 0) {
+            const top = podium();
+            show(`<div class="podium"><div class="winner">🏆 ${esc(top[0].name)}</div><div class="muted">by ${esc(top[0].author)}</div></div>`);
+            await sleep(left);
+        }
+        scoreboard();
+    };
+
     load(0);
-    addEventListener('resize', () => { size(); draw(0); });
-    $('[data-start]').addEventListener('click', start);
+    addEventListener('resize', () => { size(); draw(shown); });
+    if (liveAt) live();
+    else $('[data-start]').addEventListener('click', start);
     for (const b of el.querySelectorAll('[data-speed]')) {
         b.addEventListener('click', () => {
             speed = +b.dataset.speed;

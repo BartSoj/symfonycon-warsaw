@@ -1,6 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <a class="card finale-banner" href="{{ path('finale_live') }}" data-countdown="{{ finaleAt|date('c') }}" data-now="{{ 'now'|date('U') }}">
+        🏁 <b>The Grand Finale</b> · every bot on one arena at {{ finaleAt|date('H:i', 'Europe/Warsaw') }}
+        <span class="finale-banner-time" data-countdown-text>Watch live</span> <span class="btn">Watch ▶</span>
+    </a>
     <section class="hero">
         <h1>Build a bot, <span class="accent">beat The House.</span></h1>
         {% include '_rewards.html.twig' %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}The Grand Finale · Bot Arena{% endblock %}
+{% block body_class %}tv-page finale-page finale-live{% endblock %}
+{% block javascripts %}{{ importmap(['app', 'finale']) }}{% endblock %}
+
+{% block body %}
+    {% if finale %}
+        <div class="finale" data-finale="{{ [finale]|json_encode }}" data-live-at="{{ at|date('c') }}" data-live-label="{{ at|date('H:i', 'Europe/Warsaw') }}" data-now="{{ 'now'|date('U') }}"></div>
+    {% else %}
+        <div class="finale-empty"><h1>🏁 The Grand Finale</h1><p class="muted">Every bot on one arena at {{ at|date('H:i', 'Europe/Warsaw') }}.</p></div>
+    {% endif %}
+{% endblock %}

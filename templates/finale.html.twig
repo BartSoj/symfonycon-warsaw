@@ -21,7 +21,7 @@
                 {% for key, m in maps %}<option value="{{ key }}">{{ m.label }}</option>{% endfor %}
                 <option value="custom">Custom (the settings below)</option>
             </select></label>
-            <label>Bots <select name="bots"><option value="all">All visitor bots</option><option value="arena">Only bots in the arena</option></select></label>
+            <label>Bots <select name="bots"><option value="all">All visitor bots</option><option value="everyone">Visitor and arena bots</option><option value="arena">Only bots in the arena</option></select></label>
             <label><input type="checkbox" name="house" value="1"> Add The House</label>
             <label><input type="checkbox" name="vanish" value="1"> Trails vanish when a bot crashes</label>
             <fieldset><legend class="muted">Custom</legend>

@@ -15,11 +15,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ArenaController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function home(League $league): Response
+    public function home(League $league, \App\Arena\LiveFinale $live): Response
     {
         $latest = $league->recent(limit: 1)[0] ?? null;
 
-        return $this->render('home.html.twig', ['rows' => $league->leaderboard(), 'latest' => $latest]);
+        return $this->render('home.html.twig', ['rows' => $league->leaderboard(), 'latest' => $latest, 'finaleAt' => $live->get()['at']]);
     }
 
     #[Route('/bot/{name}', name: 'bot')]

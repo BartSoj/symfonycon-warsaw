@@ -135,3 +135,19 @@ footer { padding: 32px 16px 48px; font-size: .9rem; }
 .finale-history { border-collapse: collapse; margin: 8px 0 12px; font-size: .95rem; }
 .finale-history td, .finale-history th { padding: 4px 10px; text-align: left; border-bottom: 1px solid var(--line); }
 .podium ol.winners { font-size: 1.2rem; }
+
+/* /finale/live (TV) and the home page link to it */
+.finale-live .finale-count { font-size: 2.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.finale-live .finale-head h1 { font-size: 2.4rem; }
+.finale-live .finale-map { font-size: 1.4rem; }
+.finale-live .finale-standings li { padding: 3px 10px; margin: 3px 0; font-size: .95rem; }
+.finale-scores { position: fixed; inset: 0; z-index: 20; background: var(--bg); padding: 28px 40px; overflow: auto; }
+.finale-scores h1 { margin: 0 0 18px; font-size: 2.6rem; text-align: center; }
+.finale-scores-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(var(--rows, 11), auto); gap: 8px 28px; }
+.finale-scores-list li { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; font-size: 1.15rem; min-width: 0; }
+.finale-scores-list li.top { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--card)); }
+.finale-scores-list .place { width: 2.2em; font-weight: 800; font-variant-numeric: tabular-nums; }
+.finale-scores-list .who { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.finale-scores-list .how { font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+.finale-banner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; border-color: var(--gold); }
+.finale-banner-time { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }

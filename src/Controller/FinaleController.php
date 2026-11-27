@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Arena\Battle;
+use App\Arena\LiveFinale;
 use App\Entity\Finale;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,27 @@ class FinaleController extends AbstractController
         }
 
         return $this->page($em, $finale ? [$finale] : []);
+    }
+
+    /**
+     * The TV screen: counts down to the start time, starts by itself, then shows every player's place. Every
+     * screen plays it in sync with the server clock, so a reload or a phone joins mid-battle. ?in=10 rehearses
+     * it starting in 10 seconds.
+     */
+    #[Route('/finale/live', name: 'finale_live')]
+    public function live(EntityManagerInterface $em, LiveFinale $live, Request $request): Response
+    {
+        ['id' => $id, 'at' => $at] = $live->get();
+        $repo = $em->getRepository(Finale::class);
+        $finale = $id ? $repo->find($id) : $repo->findOneBy([], ['id' => 'DESC']);
+        if ($request->query->has('in')) {
+            $at = new \DateTimeImmutable('@'.(time() + $request->query->getInt('in')));
+        }
+
+        return $this->render('finale_live.html.twig', [
+            'finale' => $finale ? ['id' => $finale->id, 'title' => $finale->title, 'replay' => $finale->replay] : null,
+            'at' => $at,
+        ]);
     }
 
     /** Plays several precomputed finales back to back: /finale/show?ids[]=3&ids[]=7 */
@@ -77,7 +99,7 @@ class FinaleController extends AbstractController
                 '--facing='.(\in_array($r->get('facing'), ['back', 'side', 'door'], true) ? $r->get('facing') : 'back'),
                 '--pen='.max(3, min(12, $r->getInt('pen', 5))),
                 '--door='.max(1, min(6, $r->getInt('door', 2))),
-                '--bots='.($r->get('bots') === 'arena' ? 'arena' : 'all'),
+                '--bots='.(\in_array($r->get('bots'), ['arena', 'everyone'], true) ? $r->get('bots') : 'all'),
                 '--start='.(\in_array($r->get('start'), ['ring', 'center', 'random'], true) ? $r->get('start') : 'ring'),
                 '--walls='.max(0, min(60, $r->getInt('walls'))),
                 '--cells='.max(30, min(2000, $r->getInt('cells', 90))),

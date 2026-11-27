@@ -5,7 +5,6 @@ main=$(git -C "$(dirname "$0")/.." worktree list --porcelain | head -1 | cut -d'
 cd "$main"
 [ -d vendor ] || composer install -q --no-interaction
 php bin/console doctrine:schema:update --force -q
-php bin/console app:seed -q
 if grep -qs '^APP_ENV=prod' .env.local; then
     php bin/console asset-map:compile -q
     php bin/console cache:clear -q

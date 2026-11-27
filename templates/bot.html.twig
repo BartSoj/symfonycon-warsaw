@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ bot.name }} · Bot Arena{% endblock %}
+
+{% block body %}
+    <h1><span class="swatch big" style="background: {{ bot.color }}"></span> {{ bot.name }}</h1>
+    <p class="muted">by {{ bot.author }} · #{{ rank }} on the leaderboard · Elo {{ bot.elo }} · {{ bot.wins }} wins, {{ bot.losses }} losses, {{ bot.draws }} draws</p>
+    {% if bot.problem %}<div class="card warn">⚠️ {{ bot.problem }}</div>{% endif %}
+
+    {% if trial %}
+        <div class="card trial {{ trial.passed ? 'passed' }}">
+            {% if trial.passed %}
+                <p class="big">🧥 Hoodie earned!</p>
+                <p>{{ bot.name }} beat The House {{ trial.wins }} out of 3. Show this screen at the JetBrains booth.</p>
+            {% else %}
+                <p class="big">{{ trial.wins }}/3 against The House</p>
+                <p>You need 2 wins for the hoodie. Ask the agent to make it smarter: every new version gets a new trial.</p>
+            {% endif %}
+            <div class="trial-games">
+                {% for game in trial.games %}
+                    <a href="{{ path('game', {id: game.id}) }}">{{ game.winner == bot.id ? '✅ win' : (game.winner ? '❌ loss' : '🤝 draw') }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <h2>Recent matches</h2>
+    {% for game in recent %}
+        {% set me = game.replay.players[0].key == bot.key ? 0 : 1 %}
+        {% set them = game.replay.players[1 - me] %}
+        <a class="card" href="{{ path('game', {id: game.id}) }}">
+            {{ game.replay.winner is same as(me) ? '✅' : (game.replay.winner is null ? '🤝' : '❌') }}
+            vs <b>{{ them.name }}</b> <span class="muted">by {{ them.author }}{{ game.trial ? ' · trial' }} · {{ game.playedAt|date('H:i') }}</span>
+        </a>
+    {% else %}
+        <p class="muted">No matches yet. Watch the TV, it'll be on soon.</p>
+    {% endfor %}
+
+    <h2>The code</h2>
+    <pre class="code">{{ source }}</pre>
+{% endblock %}

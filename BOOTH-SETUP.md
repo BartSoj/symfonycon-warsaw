@@ -18,7 +18,7 @@ scripts. Be quick, and don't spawn subagents.
 5. **Serve it publicly.** Start `bin/serve` in the background, logging to `var/log/serve.log`. It
    switches this folder to prod mode, starts PHP on 127.0.0.1:8000, and opens a Cloudflare quick
    tunnel. Wait until the log shows a `https://….trycloudflare.com` URL. Then curl `/`, `/tv` and
-   `/ideas` on that URL; each must return 200.
+   `/merch` on that URL; each must return 200.
 6. **Dry-run the ship setup.** Nothing gets shipped:
    1. Run `git worktree add ../scl-try -b try`.
    2. Run `bin/setup` in that worktree, then `php bin/console app:check` there.

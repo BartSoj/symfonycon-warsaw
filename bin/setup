@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# First run in a fresh checkout or worktree: dependencies, database, talks.
+# First run in a fresh checkout or worktree: dependencies, database.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 composer install -q --no-interaction
 php bin/console doctrine:schema:update --force -q
-php bin/console app:seed -q
 echo "Ready. Preview: php -S 127.0.0.1:8001 -t public"

@@ -1,206 +1,25 @@
 <!DOCTYPE html>
-<html lang="{{ lang() }}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}SymfonyCon Live{% endblock %}</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-    <script>(t=>t&&document.documentElement.classList.add(t))(localStorage.theme);localStorage.mode&&document.documentElement.classList.add('mode-'+localStorage.mode)</script>
-    {% block javascripts %}{{ importmap('app') }}{% endblock %}
+    <title>{% block title %}Bot Arena · SymfonyCon Live{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏁</text></svg>">
+    {% block javascripts %}{{ importmap(['app', 'arena']) }}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 <header class="top">
     <div class="wrap">
-        <a class="brand" href="{{ path('home') }}">⚡ SymfonyCon <b>Live</b></a>
+        <a class="brand" href="{{ path('home') }}">🏁 SymfonyCon <b>Bot Arena</b></a>
         <nav>
-            {# Add a link here for every new page #}
-            <a href="{{ path('home') }}">{{ 'Schedule'|t }}</a>
-            <a href="{{ path('board') }}">🚉 {{ 'Board'|t }}</a>
-            <a href="{{ path('speakers') }}">{{ 'Speakers'|t }}</a>
-            <a href="{{ path('ideas') }}">{{ 'Ideas'|t }}</a>
-            <a href="{{ path('shipped') }}">{{ 'Shipped'|t }}</a>
-            <a href="{{ path('merch') }}">🎁 {{ 'Merch'|t }}</a>
-            <a href="{{ path('lang', {code: lang() == 'tlh' ? 'en' : 'tlh'}) }}" title="{{ 'Language'|t }}">{{ lang() == 'tlh' ? '🇬🇧 EN' : '🖖 tlhIngan' }}</a>
-            <span class="theme-pick">
-                <button class="rat-toggle kc-open" id="theme-btn" type="button" title="Theme" aria-haspopup="true" aria-expanded="false">🖌️</button>
-                <span class="theme-menu" id="theme-menu" hidden>
-                    <button type="button" data-theme="light">☀️ Light</button>
-                    <button type="button" data-theme="dark">🌙 Dark</button>
-                    <button type="button" data-theme="phpstorm">🐘 PhpStorm</button>
-                </span>
-            </span>
-            <button class="rat-toggle kc-open" title="Cheat code" onclick="document.getElementById('kc-pad').hidden=false">🎮</button>
-            <button class="rat-toggle on" id="mode-btn" title="Regular / Day / Night" onclick="localStorage.mode={'':'day',day:'night',night:''}[localStorage.mode||''];location.reload()">{{ '' }}🌗</button>
-            <script>document.getElementById('mode-btn').textContent={day:'☀️',night:'🌙'}[localStorage.mode]||'🌗'</script>
-            <button class="rat-toggle" id="cc-btn" title="Annoying cookie banner on/off" onclick="localStorage.ccOff=localStorage.ccOff?'':'1';location.reload()">🍪</button>
+            <a href="{{ path('home') }}">Arena</a>
+            <a href="{{ path('merch') }}">🎁 Merch</a>
         </nav>
     </div>
 </header>
 <main class="wrap">
     {% block body %}{% endblock %}
 </main>
-<footer class="wrap muted">
-    {{ 'Built live by SymfonyCon attendees with AI agents in PhpStorm, at the JetBrains booth.'|t }}
-    <a href="{{ path('shipped') }}">{{ shipped()|length }} {{ 'features by'|t }} {{ builders()|length }} {{ 'people so far'|t }}</a>.
-    <a href="{{ path('ideas') }}">{{ 'Add yours →'|t }}</a>
-    <div class="ec-hint">psst… the evil corp has 5 letters: <input id="ec-in" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="10" placeholder="e____"></div>
-    <div class="kc-hint">↑↑↓↓←→←→BA <span>(swipe it on your phone, then tap twice)</span></div>
-</footer>
-<script>
-(()=>{const btn=document.getElementById('theme-btn'),menu=document.getElementById('theme-menu'),h=document.documentElement,T=['light','dark','phpstorm'];
-const cur=()=>T.find(t=>h.classList.contains(t))||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-const mark=()=>menu.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('on',b.dataset.theme==cur()));
-const show=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',o)};
-btn.addEventListener('click',()=>{mark();show(menu.hidden)});
-menu.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>{h.classList.remove(...T);h.classList.add(b.dataset.theme);localStorage.theme=b.dataset.theme;mark();show(false)}));
-document.addEventListener('click',e=>{if(!e.target.closest('.theme-pick'))show(false)})})();
-</script>
-<div id="kc-pad" hidden><div class="kc-pad-box"><p>Enter the cheat code</p><div id="kc-show">&nbsp;</div>
-<div class="kc-dpad"><span></span><button data-k="ArrowUp">▲</button><span></span><button data-k="ArrowLeft">◀</button><span></span><button data-k="ArrowRight">▶</button><span></span><button data-k="ArrowDown">▼</button><span></span></div>
-<div class="kc-ab"><button data-k="b">B</button><button data-k="a">A</button></div><button class="btn-outline btn" onclick="document.getElementById('kc-pad').hidden=true">close</button></div></div>
-<div id="kc" hidden><div class="kc-box"><div class="kc-big">🐘</div><h1>CHEAT UNLOCKED</h1><p>+30 LIVES · INFINITE COFFEE · ALL TALKS IN 8-BIT</p><button class="btn" onclick="document.getElementById('kc').hidden=true">CONTINUE ▶</button></div></div>
-<script>
-(()=>{const S=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let b=[];
-const L={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→',b:'B',a:'A'};
-const push=k=>{b=[...b,k].slice(-10);document.getElementById('kc-show').textContent=b.map(x=>L[x]||'').join(' ')||'\u00a0';if(b.join()==S.join()){b=[];document.getElementById('kc-pad').hidden=true;go()}};
-document.querySelectorAll('#kc-pad [data-k]').forEach(x=>x.addEventListener('click',e=>{e.stopPropagation();push(x.dataset.k)}));
-document.addEventListener('keydown',e=>push(e.key.length==1?e.key.toLowerCase():e.key));
-let sx,sy;addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-addEventListener('touchend',e=>{if(e.target.closest('#kc-pad'))return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
-if(Math.max(Math.abs(dx),Math.abs(dy))<30){push(b.length==8?'b':'a');return}
-push(Math.abs(dx)>Math.abs(dy)?(dx>0?'ArrowRight':'ArrowLeft'):(dy>0?'ArrowDown':'ArrowUp'))},{passive:true});
-function go(){document.body.classList.add('kc-on');document.getElementById('kc').hidden=false;
-try{const A=new AudioContext();[523,659,784,1047,784,1047,1319,1568].forEach((f,i)=>{const o=A.createOscillator(),g=A.createGain();o.type='square';o.frequency.value=f;g.gain.value=.08;o.connect(g).connect(A.destination);o.start(A.currentTime+i*.11);o.stop(A.currentTime+i*.11+.1)})}catch(e){}
-const E='🐘⚡🎉🍺🦄🐀⭐🍕💜🎮';let n=0;const t=setInterval(()=>{const d=document.createElement('div');d.className='kc-drop';
-d.textContent=[...E][Math.random()*[...E].length|0];d.style.left=Math.random()*100+'vw';d.style.fontSize=1+Math.random()*2.5+'rem';d.style.animationDuration=2+Math.random()*3+'s';
-document.body.appendChild(d);setTimeout(()=>d.remove(),5500);if(++n>150)clearInterval(t)},40)}})();
-</script>
-<div id="ec-hack" hidden>
-    <pre id="ec-rain"></pre>
-    <div class="ec-box">
-        <svg viewBox="0 0 120 140" width="150" aria-hidden="true">
-            <path d="M60 8C30 8 18 34 18 62v18c0 8-8 14-14 20v40h112v-40c-6-6-14-12-14-20V62C102 34 90 8 60 8z" fill="#111"/>
-            <path d="M60 26c-18 0-28 18-28 38s10 34 28 34 28-14 28-34-10-38-28-38z" fill="#000"/>
-            <circle cx="49" cy="66" r="2.5" fill="#0f0"/><circle cx="71" cy="66" r="2.5" fill="#0f0"/>
-            <path d="M30 140l14-34h32l14 34z" fill="#1b1b1b"/>
-        </svg>
-        <h1 class="ec-glitch" data-t="HACKED BY fsociety">HACKED BY fsociety</h1>
-        <p id="ec-type"></p>
-        <button class="btn" onclick="location.reload()">reboot</button>
-    </div>
-</div>
-<script>
-(()=>{let buf='';const go=()=>{if(document.body.classList.contains('ec-on'))return;document.body.classList.add('ec-on');
-document.querySelectorAll('header,main .card,main h1,main h2,main p,main a,footer,main li').forEach((el,i)=>{el.style.transition=`transform ${1+Math.random()*1.5}s cubic-bezier(.5,0,1,.5) ${Math.random()*1.2}s, opacity 2s ${1+Math.random()}s`;
-requestAnimationFrame(()=>{el.style.transform=`translate(${(Math.random()-.5)*200}px,${innerHeight+300}px) rotate(${(Math.random()-.5)*180}deg)`;el.style.opacity=0})});
-setTimeout(()=>{const h=document.getElementById('ec-hack');h.hidden=false;const r=document.getElementById('ec-rain');
-setInterval(()=>{let t='';for(let i=0;i<1800;i++)t+=Math.random()<.04?'\n':'01fsociety#$%&'[Math.random()*14|0];r.textContent=t},120);
-const msg='> your conference schedule has been liberated.\n> the corporations no longer own your talks.\n> nothing personal. just a 5-letter password.\n> logged in as: root@fsociety ▮',p=document.getElementById('ec-type');let k=0;const ty=setInterval(()=>{p.textContent=msg.slice(0,++k);if(k>=msg.length)clearInterval(ty)},40)},1800)};
-const chk=v=>{buf=(buf+v).toLowerCase().slice(-5);if(buf=='ecorp')go()};
-document.addEventListener('keydown',e=>{if(e.target.id!='ec-in'&&e.key.length==1)chk(e.key)});
-document.getElementById('ec-in').addEventListener('input',e=>{if(e.target.value.toLowerCase().replace(/\s/g,'').includes('ecorp')){e.target.blur();go()}})})();
-</script>
-<script>
-(()=>{const R=[
-"..........EE....",
-".........EPPE...",
-".....BBBBBEEBB..",
-"...BBBBBBBBBBkB.",
-"..BBBBBBBBBBBBBN",
-"T.BBBBBBBBBBBBB.",
-".TBBBBBBBBBBBB..",
-"..TBBBBBBBBBB...",
-"...F.F....F.F..."],rats=[],h=()=>Math.random()*360|0;
-function rat(){const c=document.createElement('canvas'),s=2+Math.random()*3|0,hu=h(),l=25+Math.random()*55|0;
-c.width=16;c.height=9;const x=c.getContext('2d'),col={B:`hsl(${hu},${Math.random()*60|0}%,${l}%)`,E:`hsl(${hu},40%,${Math.min(l+20,85)}%)`,P:`hsl(${330+Math.random()*30|0},80%,75%)`,k:['#000','#e00','#06f'][Math.random()*3|0],N:'#f6a',T:`hsl(${h()},70%,70%)`,F:'#f9c'},spot=`hsl(${h()},70%,50%)`,sp=Math.random()<.6;
-let kind='';if(false){kind=['wolf','ghost','zombie'][Math.random()*3|0];
-if(kind=='wolf')Object.assign(col,{B:'#4a3423',E:'#2a1c12',P:'#6b4a33',k:'#ff0',N:'#111',T:'#2a1c12',F:'#ddd'});
-if(kind=='ghost')Object.assign(col,{B:'#f4f7ff',E:'#dfe6ff',P:'#cfd8ff',k:'#123',N:'#bcd',T:'#e6ecff',F:'#f4f7ff'});
-if(kind=='zombie')Object.assign(col,{B:'#6f8f3a',E:'#4f6b25',P:'#a33',k:'#f00',N:'#7a2',T:'#5a2',F:'#8b0000'})}
-R.forEach((r,y)=>[...r].forEach((ch,i)=>{if(ch=='.')return;x.fillStyle=ch=='B'&&!kind&&sp&&Math.random()<.18?spot:ch=='B'&&kind=='zombie'&&Math.random()<.12?'#8b0000':ch=='B'&&kind=='wolf'&&Math.random()<.25?'#2a1c12':col[ch];x.fillRect(i,y,1,1)}));
-if(kind=='wolf'){x.fillStyle='#2a1c12';x.fillRect(10,0,1,2);x.fillRect(13,1,1,2);x.fillStyle='#fff';x.fillRect(14,5,1,1);x.fillRect(12,5,1,1)}
-if(kind)c.className='spooky-'+kind;
-Object.assign(c.style,{position:'fixed',zIndex:50,pointerEvents:'none',imageRendering:'pixelated',width:16*s*2+'px',height:9*s*2+'px',left:Math.random()*(innerWidth-160)+'px',top:Math.random()*(innerHeight-90)+'px',transition:'opacity .6s'});if(kind=='ghost')c.style.opacity=.55;
-c.vx=(Math.random()<.5?-1:1)*(1+Math.random()*3);c.side=Math.random()<.5;c.vy=(Math.random()-.5)*3;c.px=parseFloat(c.style.left);c.py=parseFloat(c.style.top);document.body.appendChild(c);rats.push(c);
-if(rats.length>10){const d=rats.splice(Math.random()*rats.length|0,1)[0];d.style.opacity=0;setTimeout(()=>d.remove(),600)}}
-function tick(){const W=innerWidth,H=innerHeight;rats.forEach(c=>{const w=c.offsetWidth,hh=c.offsetHeight;
-if(Math.abs(c.vy)<1)c.vy=(c.vy<0?-1:1)*(1+Math.random()*2);c.px=c.side?W-w:0;c.py+=c.vy;if(c.py<0||c.py>H-hh){c.vy*=-1;c.py=Math.max(0,Math.min(H-hh,c.py))}c.style.left=c.px+'px';c.style.top=c.py+'px';c.style.transform=`rotate(${c.vy>0?90:-90}deg)`});
-requestAnimationFrame(tick)}
-rat();setInterval(rat,10000);tick()})();
-</script>
-<div id="cc">
-    <div class="cc-box">
-        <svg viewBox="0 0 120 120" width="130" aria-hidden="true">
-            <circle cx="60" cy="60" r="56" fill="#d9a05b" stroke="#a8692c" stroke-width="4"/>
-            <circle cx="22" cy="40" r="5" fill="#4a2a12"/><circle cx="98" cy="38" r="4" fill="#4a2a12"/><circle cx="30" cy="92" r="5" fill="#4a2a12"/><circle cx="92" cy="88" r="4" fill="#4a2a12"/><circle cx="62" cy="14" r="4" fill="#4a2a12"/>
-            <path d="M28 42q14-12 30-2M64 38q16-10 30 4" stroke="#222" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <path d="M32 50q10-6 22 0q-10 6-22 0z" fill="#fff" stroke="#222" stroke-width="3"/><circle cx="48" cy="50" r="2.5" fill="#222"/>
-            <path d="M66 50q10-6 22 0q-10 6-22 0z" fill="#fff" stroke="#222" stroke-width="3"/><circle cx="82" cy="50" r="2.5" fill="#222"/>
-            <path d="M20 62q40 52 82-4q-6 2-12 2q-30 18-58 0q-6 2-12 2z" fill="#fff" stroke="#222" stroke-width="3.5" stroke-linejoin="round"/>
-            <path d="M30 66l2 8M40 70l1 10M50 72v11M60 73v11M70 72v11M80 69l-1 10M90 64l-2 8" stroke="#222" stroke-width="2"/>
-            <path d="M24 60q-6-8 0-14M98 56q6-8 0-12" stroke="#222" stroke-width="2.5" fill="none"/>
-        </svg>
-        <h2>We use cookies 🍪</h2>
-        <p>This website uses cookies to improve your experience, track your every move, and generally be a menace. By staying alive, you agree.</p>
-        <p class="muted cc-small">Your choice will not be remembered. We'll ask again. Every. Single. Time.</p>
-        <div class="cc-btns">
-            <button class="btn" id="cc-yes">Accept all cookies</button>
-            <button class="btn btn-outline" id="cc-no">Disagree</button>
-        </div>
-    </div>
-</div>
-<script>
-(()=>{document.getElementById('cc-btn')?.classList.toggle('on',!localStorage.ccOff);if(localStorage.ccOff){document.getElementById('cc').remove();return}const o=document.getElementById('cc'),box=o.querySelector('.cc-box'),no=document.getElementById('cc-no'),T=['Nope 😏','Too slow!','Try again','Not today','Problem?','🍪 says no','Just accept it','u mad?'];let last=0;
-document.getElementById('cc-yes').onclick=()=>o.remove();
-const place=(x,y)=>{no.style.left=x+'px';no.style.top=y+'px'};
-const yes=document.getElementById('cc-yes');place((box.clientWidth-no.offsetWidth)/2,yes.offsetTop+yes.offsetHeight+16);
-const run=(mx,my)=>{const now=Date.now();if(now-last<350)return;last=now;
-const W=box.clientWidth-no.offsetWidth-8,H=box.clientHeight-no.offsetHeight-8;let bx=8,by=8,bd=-1;
-for(let i=0;i<25;i++){const x=8+Math.random()*(W-8),y=8+Math.random()*(H-8),d=Math.hypot(x+no.offsetWidth/2-mx,y+no.offsetHeight/2-my);if(d>bd){bd=d;bx=x;by=y}}
-place(bx,by);no.textContent=T[Math.random()*T.length|0];no.style.background=`hsl(${Math.random()*360|0},85%,50%)`};
-const rel=e=>{const r=box.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return[p.clientX-r.left,p.clientY-r.top]};
-box.addEventListener('mousemove',e=>{const[mx,my]=rel(e),x=no.offsetLeft,y=no.offsetTop;if(mx>x-50&&mx<x+no.offsetWidth+50&&my>y-50&&my<y+no.offsetHeight+50)run(mx,my)});
-['pointerdown','touchstart','click'].forEach(ev=>no.addEventListener(ev,e=>{e.preventDefault();last=0;run(...rel(e))}))})();
-</script>
-<a id="tpay-ball" href="https://tpay.com" target="_blank" rel="noopener">tpay.com</a>
-<script>
-(() => {
-  const b = document.getElementById('tpay-ball'); if (!b) return;
-  let x = Math.random() * (innerWidth - 120), y = Math.random() * (innerHeight - 40), dx = 2.2, dy = 1.8;
-  const step = () => {
-    const w = b.offsetWidth, h = b.offsetHeight;
-    x += dx; y += dy;
-    if (x <= 0 || x + w >= innerWidth) { dx = -dx; x = Math.max(0, Math.min(x, innerWidth - w)); b.style.color = `hsl(${Math.random()*360},90%,60%)`; }
-    if (y <= 0 || y + h >= innerHeight) { dy = -dy; y = Math.max(0, Math.min(y, innerHeight - h)); b.style.color = `hsl(${Math.random()*360},90%,60%)`; }
-    b.style.transform = `translate(${x}px, ${y}px)`;
-    requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-})();
-</script>
-<div id="ship" aria-hidden="true">🚀</div>
-<script>
-(()=>{const S=document.getElementById('ship');let x=innerWidth/2,y=innerHeight-80,a=0,cool=0,tgt=null;const last=new WeakMap(),dead=new WeakSet();
-const movers=()=>{const out=[];document.querySelectorAll('body > *,.kc-drop').forEach(el=>{if(el==S||dead.has(el)||el.classList.contains('ship-fx')||el.hidden)return;
-const r=el.getBoundingClientRect();if(!r.width||r.width>300||r.height>300)return;const p=last.get(el);last.set(el,[r.left,r.top]);
-if(p&&Math.hypot(p[0]-r.left,p[1]-r.top)>0.5&&getComputedStyle(el).opacity>0.1)out.push(el)});return out};
-const boom=el=>{dead.add(el);const r=el.getBoundingClientRect();for(let i=0;i<14;i++){const f=document.createElement('div');f.className='ship-fx ship-spark';f.textContent=['💥','✨','🔥'][i%3];
-f.style.left=r.left+r.width/2+'px';f.style.top=r.top+r.height/2+'px';f.style.setProperty('--dx',(Math.random()-.5)*160+'px');f.style.setProperty('--dy',(Math.random()-.5)*160+'px');document.body.appendChild(f);setTimeout(()=>f.remove(),700)}
-el.style.transition='opacity .3s';el.style.opacity=0;el.style.pointerEvents='none';
-if(el.id=='tpay-ball')setTimeout(()=>{el.style.opacity=1;el.style.pointerEvents='';dead.delete(el)},8000);else setTimeout(()=>el.remove(),400)};
-const shoot=(el)=>{const r=el.getBoundingClientRect(),tx=r.left+r.width/2,ty=r.top+r.height/2,d=Math.hypot(tx-x,ty-y),l=document.createElement('div');l.className='ship-fx ship-laser';
-Object.assign(l.style,{left:x+'px',top:y+'px',width:d+'px',transform:`rotate(${Math.atan2(ty-y,tx-x)}rad)`});document.body.appendChild(l);setTimeout(()=>l.remove(),150);
-if(Math.random()<.5)boom(el)};
-let scan=[];setInterval(()=>{scan=movers()},300);
-const tick=()=>{if(!tgt||dead.has(tgt)||!tgt.isConnected){tgt=scan.filter(e=>!dead.has(e)&&e.isConnected).sort((p,q)=>{const a=p.getBoundingClientRect(),b=q.getBoundingClientRect();return Math.hypot(a.left-x,a.top-y)-Math.hypot(b.left-x,b.top-y)})[0]||null}
-let tx=innerWidth/2+Math.sin(Date.now()/1500)*innerWidth/3,ty=innerHeight-80;
-if(tgt){const r=tgt.getBoundingClientRect();tx=r.left+r.width/2;ty=r.top+r.height/2+110}
-const dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy);if(d>1){const v=Math.min(d,5);x+=dx/d*v;y+=dy/d*v}
-x=Math.max(20,Math.min(innerWidth-20,x));y=Math.max(20,Math.min(innerHeight-20,y));
-if(tgt){const r=tgt.getBoundingClientRect();a=Math.atan2(r.top+r.height/2-y,r.left+r.width/2-x);if(--cool<0&&Math.hypot(r.left-x,r.top-y)<350){cool=20;shoot(tgt)}}else a=-Math.PI/2;
-S.style.transform=`translate(${x-20}px,${y-20}px) rotate(${a+Math.PI/4}rad)`;requestAnimationFrame(tick)};tick()})();
-</script>
-<div id="lake" aria-hidden="true"></div>
-<script src="/lake.js?v=2"></script>
+<footer class="wrap muted">Every bot here was built live by a SymfonyCon attendee with an AI agent in PhpStorm Air, at the JetBrains booth.</footer>
 </body>
 </html>

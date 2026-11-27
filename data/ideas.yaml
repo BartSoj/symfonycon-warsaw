@@ -1,86 +1,34 @@
-# Ideas shown on /ideas and the TV. bin/ship marks one shipped when you pass its id.
-# level: quick (about 2 min), medium (about 5 min), big (10 min or more)
-- id: star-talks
-  title: ⭐ Star talks and get my own agenda
-  pitch: A star on every talk, and a "My agenda" page with the talks you starred.
-  level: medium
-- id: now-next
-  title: Now and next
-  pitch: At the top of the schedule, what's on right now in each room and what comes next.
+# Strategy ideas for Bot Arena bots, shown on the home page. bin/ship records the id when you pass it.
+# level: quick (a few lines), medium (a small algorithm), big (for the ambitious)
+- id: survivor
+  title: 🛟 The survivor
+  pitch: Never drive into a wall or a trail. Go straight while it's safe, otherwise turn. That's Rookie, and it loses to The House.
   level: quick
-- id: reactions
-  title: 🔥 👏 🤯 reactions on talks
-  pitch: Tap an emoji on a talk page, and everyone sees the live counts.
+- id: wall-hugger
+  title: 🧱 The wall hugger
+  pitch: Stay close to walls and trails so you waste no space, like filling a room from the edges.
   level: quick
-- id: rate-talks
-  title: Rate a talk
-  pitch: Give 1 to 5 stars once a talk has ended, and see the average on the talk page.
+- id: flood-fill
+  title: 🌊 Count the space
+  pitch: Before each move, flood-fill from every safe cell and go where the most free cells are reachable. Never get trapped in a pocket.
   level: medium
-- id: top-talks
-  title: Most loved talks
-  pitch: A leaderboard of the talks with the most stars, ratings or reactions.
-  level: medium
-- id: search
-  title: Search the schedule
-  pitch: Type to filter talks by title, speaker or theme.
+- id: no-head-on
+  title: 🙅 No head-on crashes
+  pitch: Avoid the cells the opponent could reach next. A draw is no win.
   level: quick
-- id: themes
-  title: Filter by theme
-  pitch: Chips for AI, performance, Doctrine, security… that filter the schedule.
-  level: quick
-- id: speakers
-  title: Speaker pages
-  pitch: Tap a speaker's name to see all of their talks.
-  level: quick
-- id: calendar
-  title: Add to my calendar
-  pitch: An .ics download for a talk, or for your whole agenda.
-  level: quick
-- id: ask-speaker
-  title: Ask the speaker
-  pitch: Post a question on a talk page, and upvote the best ones before the Q&A.
+- id: hunter
+  title: 🎯 The hunter
+  pitch: Drive towards the opponent's head and cut them off, so they run out of room before you do.
   level: medium
-- id: guestbook
-  title: The conference guestbook
-  pitch: Leave a message for SymfonyCon, like the app in the Symfony book.
-  level: medium
-- id: suggest-ideas
-  title: Suggest an idea from your phone
-  pitch: A form on this page, so anyone can add an idea to this list.
-  level: medium
-- id: vote-ideas
-  title: Vote for the next feature
-  pitch: Upvote ideas, and the most wanted one floats to the top and onto the TV.
-  level: medium
-- id: hackday-board
-  title: Hackday team board
-  pitch: Post a project for Saturday's Hackday, and let others join your team.
-  level: medium
-- id: bingo
-  title: Conference bingo
-  pitch: A personal bingo card with things like "it depends" and "this is a breaking change", and tap to mark them.
-  level: medium
-- id: countdown
-  title: Countdown to the party
-  pitch: Time left until the next break, lunch, or Thursday's Community Evening.
-  level: quick
-- id: polish
-  title: Po polsku
-  pitch: Switch the whole site to Polish.
-  level: medium
-- id: trivia
-  title: Symfony trivia
-  pitch: A question of the hour about Symfony's history, with a scoreboard.
-  level: medium
-- id: json-api
-  title: A JSON API for the schedule
-  pitch: /api/talks and /api/talks/{slug}, for anyone who wants to build their own client.
-  level: quick
-- id: mcp-server
-  title: An MCP server for the schedule
-  pitch: So your own AI agent can ask "what's on after lunch?".
+- id: territory
+  title: 🗺️ Territory (Voronoi)
+  pitch: Count the cells you reach before the opponent does, and pick the move that gives you the most territory.
   level: big
-- id: hall-of-fame
-  title: Builders' hall of fame
-  pitch: Everyone who asked for a feature, with what they shipped.
+- id: lookahead
+  title: 🧠 Think ahead
+  pitch: Minimax a few moves deep, with your move and theirs, and score each position by territory.
+  level: big
+- id: zigzag
+  title: 〰️ Zig-zag
+  pitch: Snake back and forth in tight rows to fill your area without leaving holes.
   level: quick

@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
-use App\Repository\TalkRepository;
+use App\Arena\Bots;
+use App\Arena\League;
+use App\Arena\Referee;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,18 +12,39 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/** The only test this app has: every page must render. bin/ship runs it. */
-#[AsCommand('app:check', 'Render every GET page once and fail on any error')]
+/** The only test this app has: every bot plays a few matches without errors, and every page renders. bin/ship runs it. */
+#[AsCommand('app:check', 'Check every bot, then render every GET page once and fail on any error')]
 class CheckCommand
 {
-    public function __construct(private RouterInterface $router, private HttpKernelInterface $kernel, private TalkRepository $talks)
+    public function __construct(private RouterInterface $router, private HttpKernelInterface $kernel, private Bots $bots, private Referee $referee)
     {
     }
 
     public function __invoke(SymfonyStyle $io): int
     {
-        $sample = ['slug' => $this->talks->findOneBy(['type' => 'talk'])?->slug ?? 'none', 'id' => 1];
         $failed = 0;
+
+        foreach ($this->bots->keys() as $key) {
+            $info = $this->bots->info($key);
+            $problems = array_filter([$info['problem']]);
+            $wins = 0;
+            foreach ([...League::TRIAL_SEEDS, 7, 8] as $i => $seed) {
+                $replay = $this->referee->play($key, $i < 3 ? League::HOUSE : 'RookieBot', $seed);
+                $crash = $replay['players'][0]['crash'];
+                if ($crash['error'] ?? false) {
+                    $problems[] = "seed $seed, tick {$crash['tick']}: {$crash['reason']}";
+                }
+                $wins += $i < 3 && 0 === $replay['winner'] ? 1 : 0;
+            }
+            $verdict = $info['house'] ? '' : ($wins >= 2 ? " · beats The House $wins/3: hoodie 🎉" : " · beats The House $wins/3: no hoodie yet (needs 2)");
+            $io->writeln(\sprintf('%s bot %s "%s" by %s%s', $problems ? '<error>FAIL</error>' : '<info>ok</info>', $key, $info['name'], $info['author'], $verdict));
+            foreach (array_unique($problems) as $problem) {
+                $io->writeln("     $problem");
+            }
+            $failed += $problems ? 1 : 0;
+        }
+
+        $sample = ['name' => League::HOUSE, 'id' => 1];
         foreach ($this->router->getRouteCollection() as $name => $route) {
             if (str_starts_with($name, '_') || ($route->getMethods() && !\in_array('GET', $route->getMethods(), true))) {
                 continue;

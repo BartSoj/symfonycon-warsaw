@@ -1,26 +1,29 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>SymfonyCon Warsaw 2026</h1>
-    <p class="muted">{{ '26–27 November'|t }} · Hilton Warsaw City · {{ 'times are Warsaw time'|t }}</p>
+    <section class="hero">
+        <h1>Build a bot. Beat The House. <span class="accent">Win a hoodie.</span> 🧥</h1>
+        <p>Light cycles leave a trail behind them, and touching a trail, a wall or the edge means you crash. The last one riding wins.
+            Ask the agent in <b>PhpStorm Air</b> at the JetBrains booth to write your bot: one PHP class, live in a few minutes.</p>
+        <ol class="steps">
+            <li>Tell the agent your strategy and pick a name and colour.</li>
+            <li>It ships your bot, and it starts racing on the TV.</li>
+            <li>Beat <b>The House</b> in 2 of 3 trial matches and collect your hoodie at the booth.</li>
+        </ol>
+    </section>
 
-    {% for day, talks in days %}
-        <h2>{{ day|t }}</h2>
-        {% for talk in talks %}
-            {% if talk.isSession %}
-                <a class="card slot" id="{{ talk.slug }}" href="{{ path('talk', {slug: talk.slug}) }}">
-                    <span class="time">{{ talk.startsAt|date('H:i') }}</span>
-                    <span>
-                        <b>{{ talk.title }}</b><br>
-                        <span class="muted">{{ talk.speakers|join(', ') }}{% if talk.room %} · {{ talk.room }}{% endif %}</span>
-                    </span>
-                </a>
-            {% else %}
-                <div class="slot pause">
-                    <span class="time">{{ talk.startsAt|date('H:i') }}</span>
-                    <span class="muted">{{ talk.title }}{% if talk.type == 'social' or talk.type == 'other' and talk.room %} · {{ talk.room }}{% endif %}</span>
-                </div>
-            {% endif %}
-        {% endfor %}
+    {% if latest %}
+        <h2>Latest match</h2>
+        <div class="arena" data-arena data-game="{{ latest.forPlayer|json_encode }}"></div>
+        <p class="row"><a class="btn" href="#" data-arena-next>▶ Play a new match</a> <a class="muted" href="{{ path('game', {id: latest.id}) }}">Replay #{{ latest.id }}</a></p>
+    {% endif %}
+
+    <h2>Leaderboard</h2>
+    <p class="muted">Elo rating · wins–losses–draws. A new version of a bot starts again from 1000.</p>
+    {% include '_leaderboard.html.twig' with {rows: rows} %}
+
+    <h2>Need a strategy?</h2>
+    {% for idea in ideas() %}
+        <div class="card"><b>{{ idea.title }}</b> <span class="tag">{{ idea.level }}</span><br><span class="muted">{{ idea.pitch }}</span></div>
     {% endfor %}
 {% endblock %}

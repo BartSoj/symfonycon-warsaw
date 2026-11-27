@@ -1,0 +1,15 @@
+{# rows from League::leaderboard(); compact = for the TV #}
+<ol class="board{{ compact|default(false) ? ' compact' }}">
+    {% for row in rows %}
+        <li>
+            <a href="{{ path('bot', {name: row.key}) }}">
+                <span class="rank">{{ loop.index }}</span>
+                <span class="swatch" style="background: {{ row.color }}"></span>
+                <span class="who"><b>{{ row.name }}</b> <span class="muted">by {{ row.author }}</span>
+                    {% if row.hoodie %}<span class="tag hoodie" title="Beat The House">🧥 hoodie</span>{% elseif row.house %}<span class="tag">house</span>{% endif %}</span>
+                <span class="elo">{{ row.elo }}</span>
+                {% if not compact|default(false) %}<span class="wld muted">{{ row.wins }}–{{ row.losses }}–{{ row.draws }}</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+</ol>

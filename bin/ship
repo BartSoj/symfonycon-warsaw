@@ -17,7 +17,6 @@ check() {
     export APP_ENV=dev APP_DEBUG=1  # always check in dev, even where bin/serve set prod
     [ -d vendor ] || composer install -q --no-interaction
     php bin/console doctrine:schema:update --force -q
-    php bin/console app:seed -q
     php bin/console lint:container -q
     php bin/console lint:twig templates -q
     php bin/console lint:yaml config data -q

@@ -152,6 +152,7 @@ if (el) {
                 <span class="who"><b>${esc(p.name)}</b> <span class="muted">by ${esc(p.author)}</span></span>
                 <span class="how muted">${p.crash ? esc(p.crash.reason) : '🏆 last one riding'}</span></li>`).join('')}</ol>`;
         board.style.setProperty('--rows', Math.ceil(rows.length / 2));
+        board.insertAdjacentHTML('beforeend', `<p class="finale-replay"><a class="btn btn-outline" href="${esc(el.dataset.replay)}">↻ Replay</a></p>`);
         board.hidden = false;
     };
     const live = async () => {

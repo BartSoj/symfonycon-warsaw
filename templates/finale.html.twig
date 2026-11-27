@@ -16,6 +16,9 @@
 
     <details class="finale-staff"{{ finales ? '' : ' open' }}>
         <summary>Staff</summary>
+        <p>📺 TV: <a href="{{ path('finale_live') }}">{{ path('finale_live') }}</a> (counts down, starts by itself) ·
+            <a href="{{ path('finale_demo') }}">Demo</a> (another battle on the same screen, starts in 10 s; <code>?id=16</code> picks one) ·
+            <a href="{{ path('finale_replay') }}">Replay the real one</a></p>
         <form method="post" action="{{ path('finale_run') }}" class="finale-form">
             <label>Map <select name="map">
                 {% for key, m in maps %}<option value="{{ key }}">{{ m.label }}</option>{% endfor %}

@@ -6,7 +6,8 @@
 
 {% block body %}
     {% if finale %}
-        <div class="finale" data-finale="{{ [finale]|json_encode }}" data-live-at="{{ at|date('c') }}" data-live-label="{{ at|date('H:i', 'Europe/Warsaw') }}" data-now="{{ 'now'|date('U') }}"></div>
+        <div class="finale" data-finale="{{ [finale]|json_encode }}" data-live-at="{{ at|date('c') }}" data-live-label="{{ at|date('H:i', 'Europe/Warsaw') }}" data-now="{{ 'now'|date('U') }}" data-replay="{{ 'live' == mode ? path('finale_replay') : app.request.uri }}"></div>
+        {% if mode == 'demo' %}<p class="finale-demo-tag">DEMO · battle #{{ finale.id }}, not the real finale</p>{% endif %}
     {% else %}
         <div class="finale-empty"><h1>🏁 The Grand Finale</h1><p class="muted">Every bot on one arena at {{ at|date('H:i', 'Europe/Warsaw') }}.</p></div>
     {% endif %}

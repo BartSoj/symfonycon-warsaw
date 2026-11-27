@@ -30,22 +30,28 @@ class FinaleController extends AbstractController
 
     /**
      * The TV screen: counts down to the start time, starts by itself, then shows every player's place. Every
-     * screen plays it in sync with the server clock, so a reload or a phone joins mid-battle. ?in=10 rehearses
-     * it starting in 10 seconds.
+     * screen plays it in sync with the server clock, so a reload or a phone joins mid-battle.
+     * /finale/demo: the same screen with another battle, starting in 10 s. /finale/replay: the real one again.
      */
     #[Route('/finale/live', name: 'finale_live')]
-    public function live(EntityManagerInterface $em, LiveFinale $live, Request $request): Response
+    #[Route('/finale/demo', name: 'finale_demo', defaults: ['mode' => 'demo'])]
+    #[Route('/finale/replay', name: 'finale_replay', defaults: ['mode' => 'replay'])]
+    public function live(EntityManagerInterface $em, LiveFinale $live, Request $request, string $mode = 'live'): Response
     {
         ['id' => $id, 'at' => $at] = $live->get();
         $repo = $em->getRepository(Finale::class);
+        if ('demo' === $mode) {
+            $id = $request->query->getInt('id') ?: $em->createQuery('SELECT MAX(f.id) FROM App\Entity\Finale f WHERE f.id <> :id')->setParameter('id', $id ?? 0)->getSingleScalarResult();
+        }
         $finale = $id ? $repo->find($id) : $repo->findOneBy([], ['id' => 'DESC']);
-        if ($request->query->has('in')) {
-            $at = new \DateTimeImmutable('@'.(time() + $request->query->getInt('in')));
+        if ('live' !== $mode || $request->query->has('in')) {
+            $at = new \DateTimeImmutable('@'.(time() + $request->query->getInt('in', 'demo' === $mode ? 10 : 5)));
         }
 
         return $this->render('finale_live.html.twig', [
             'finale' => $finale ? ['id' => $finale->id, 'title' => $finale->title, 'replay' => $finale->replay] : null,
             'at' => $at,
+            'mode' => $mode,
         ]);
     }
 

@@ -9,7 +9,9 @@ use App\Arena\Direction;
 /**
  * Serpent Serré: hugs walls and trails with tight turns so it fills the board without leaving holes.
  * - While it can still reach the opponent: claim territory (cells it reaches before the opponent).
- * - Once cut off: maximise reachable space, then pick the move that touches the most walls.
+ * - Once cut off: maximise the space it can really use, then pick the move that touches the most walls.
+ * A time-bounded look-ahead (iterative deepening) stops it from entering a fork whose two pockets
+ * a plain flood fill would count together, which is how it used to trap itself.
  */
 final class SerpentSerreBot implements Bot
 {
@@ -19,170 +21,227 @@ final class SerpentSerreBot implements Bot
 
     private const DIRS = [Direction::Up, Direction::Down, Direction::Left, Direction::Right];
 
-    /** @var array<int, bool> */
+    /** @var array<int, bool> padded grid: index = (y + 1) * W + (x + 1) */
     private array $free = [];
-    private int $w = 0;
-    private int $h = 0;
+    /** @var array<int, int> */
+    private array $seen = [];
+    private int $stamp = 0;
+    private int $W = 0;
+    /** @var list<int> */
+    private array $offsets = [];
+    private int $deadline = 0;
+    private bool $aborted = false;
+    private int $nodes = 0;
+    private float $usedMs = 0.0;
 
     public function move(Arena $arena): Direction
     {
+        $start = hrtime(true);
         $me = $arena->me;
         $safe = $arena->safeDirections();
         if ($safe === []) {
             return $me->direction;
         }
 
-        $this->w = $arena->width;
-        $this->h = $arena->height;
-        $this->free = [];
-        for ($y = 0; $y < $this->h; $y++) {
-            for ($x = 0; $x < $this->w; $x++) {
-                $this->free[$y * $this->w + $x] = $arena->isFree($x, $y);
-            }
-        }
-
-        $op = $arena->opponents[0] ?? null;
-        $opNext = [];
-        if ($op !== null) {
-            foreach (self::DIRS as $d) {
-                $ox = $op->x + $d->dx();
-                $oy = $op->y + $d->dy();
-                if ($this->isFree($ox, $oy)) {
-                    $opNext[$oy * $this->w + $ox] = true;
+        $w = $arena->width;
+        $h = $arena->height;
+        $this->W = $W = $w + 2;
+        $this->offsets = [-$W, $W, -1, 1];
+        $this->free = array_fill(0, $W * ($h + 2), false);
+        $this->seen = array_fill(0, $W * ($h + 2), 0);
+        $this->stamp = 0;
+        $freeCount = 0;
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                if ($arena->isFree($x, $y)) {
+                    $this->free[($y + 1) * $W + $x + 1] = true;
+                    $freeCount++;
                 }
             }
         }
 
-        $best = $safe[0];
-        $bestScore = -PHP_INT_MAX;
-        foreach ($safe as $d) {
-            $nx = $me->x + $d->dx();
-            $ny = $me->y + $d->dy();
-            $idx = $ny * $this->w + $nx;
+        // Time budget: 3 s per match in total, so spread what is left over the moves still to play.
+        $remainingMs = 2500.0 - $this->usedMs;
+        $movesLeft = max(30, intdiv($freeCount, 2));
+        $perMoveMs = max(0.5, min(20.0, $remainingMs / $movesLeft));
+        $this->deadline = $start + (int) ($perMoveMs * 1e6);
 
-            $this->free[$idx] = false;
-            [$area, $touchesOp] = $this->flood($nx, $ny, $op?->x, $op?->y);
-
-            if ($op !== null && $touchesOp) {
-                [$mine, $theirs] = $this->voronoi($nx, $ny, $op->x, $op->y);
-                $score = ($mine - $theirs) * 1000 + $area * 10;
-            } else {
-                $score = $area * 1000;
-            }
-
-            // Tight moves: prefer cells hugging walls / trails (fewer free neighbours).
-            $score += (4 - $this->freeNeighbours($nx, $ny)) * 3;
-            // Keep going straight when equal, to avoid zigzag holes.
-            if ($d === $me->direction) {
-                $score += 1;
-            }
-            // Avoid head-on collisions.
-            if (isset($opNext[$idx])) {
-                $score -= 500000;
-            }
-
-            $this->free[$idx] = true;
-
-            if ($score > $bestScore) {
-                $bestScore = $score;
-                $best = $d;
+        $op = $arena->opponents[0] ?? null;
+        $opIdx = $op !== null ? ($op->y + 1) * $W + $op->x + 1 : -1;
+        $opNext = [];
+        if ($op !== null) {
+            foreach ($this->offsets as $o) {
+                if ($this->free[$opIdx + $o]) {
+                    $opNext[$opIdx + $o] = true;
+                }
             }
         }
+
+        $cands = [];
+        foreach ($safe as $d) {
+            $idx = ($me->y + $d->dy() + 1) * $W + $me->x + $d->dx() + 1;
+            $this->free[$idx] = false;
+            [$mine, $theirs, $met] = $op !== null ? $this->voronoi($idx, $opIdx) : [0, 0, false];
+            $tight = 0;
+            foreach ($this->offsets as $o) {
+                if (!$this->free[$idx + $o]) {
+                    $tight++;
+                }
+            }
+            $this->free[$idx] = true;
+            $cands[] = ['d' => $d, 'idx' => $idx, 'mine' => $mine, 'theirs' => $theirs, 'met' => $met, 'tight' => $tight, 'look' => $this->look($idx, 0)];
+        }
+
+        // Iterative deepening: keep the deepest look-ahead that finished in time.
+        for ($depth = 1; $depth <= 40; $depth++) {
+            $this->aborted = false;
+            $results = [];
+            foreach ($cands as $i => $c) {
+                $results[$i] = $this->look($c['idx'], $depth);
+                if ($this->aborted) {
+                    break;
+                }
+            }
+            if ($this->aborted) {
+                break;
+            }
+            foreach ($results as $i => $r) {
+                $cands[$i]['look'] = $r;
+            }
+            if (hrtime(true) > $this->deadline) {
+                break;
+            }
+        }
+
+        $bestLook = max(array_column($cands, 'look'));
+        $best = $cands[0]['d'];
+        $bestScore = -PHP_INT_MAX;
+        foreach ($cands as $c) {
+            if ($c['met']) {
+                $score = ($c['mine'] - $c['theirs']) * 100 + $c['look'] * 10;
+                // Never trade real space for territory: that is how it walled itself in.
+                if ($c['look'] < $bestLook * 0.7) {
+                    $score -= 10_000_000;
+                }
+            } else {
+                $score = $c['look'] * 1000;
+            }
+            $score += $c['tight'] * 3;
+            if ($c['d'] === $me->direction) {
+                $score += 1;
+            }
+            if (isset($opNext[$c['idx']])) {
+                $score -= 300_000;
+            }
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $best = $c['d'];
+            }
+        }
+
+        $this->usedMs += (hrtime(true) - $start) / 1e6;
 
         return $best;
     }
 
-    private function isFree(int $x, int $y): bool
+    /** Best number of cells still usable after stepping on $idx, searching $depth steps ahead. */
+    private function look(int $idx, int $depth): int
     {
-        return $x >= 0 && $y >= 0 && $x < $this->w && $y < $this->h && $this->free[$y * $this->w + $x];
-    }
-
-    private function freeNeighbours(int $x, int $y): int
-    {
-        $n = 0;
-        foreach (self::DIRS as $d) {
-            if ($this->isFree($x + $d->dx(), $y + $d->dy())) {
-                $n++;
+        $this->free[$idx] = false;
+        if ($depth === 0) {
+            $r = $this->flood($idx);
+            if ((++$this->nodes & 7) === 0 && hrtime(true) > $this->deadline) {
+                $this->aborted = true;
+            }
+        } else {
+            $r = 0;
+            foreach ($this->offsets as $o) {
+                $n = $idx + $o;
+                if ($this->free[$n]) {
+                    $v = 1 + $this->look($n, $depth - 1);
+                    if ($v > $r) {
+                        $r = $v;
+                    }
+                    if ($this->aborted) {
+                        break;
+                    }
+                }
             }
         }
+        $this->free[$idx] = true;
 
-        return $n;
+        return $r;
     }
 
-    /** @return array{int, bool} reachable cell count, and whether the opponent head is adjacent to that region */
-    private function flood(int $sx, int $sy, ?int $ox, ?int $oy): array
+    /** Free cells reachable from the neighbours of $idx. */
+    private function flood(int $idx): int
     {
-        $seen = [$sy * $this->w + $sx => true];
-        $queue = [[$sx, $sy]];
+        $s = ++$this->stamp;
+        $stack = [$idx];
+        $this->seen[$idx] = $s;
         $count = 0;
-        $touches = false;
-        for ($i = 0; $i < count($queue); $i++) {
-            [$x, $y] = $queue[$i];
-            foreach (self::DIRS as $d) {
-                $x2 = $x + $d->dx();
-                $y2 = $y + $d->dy();
-                if ($ox !== null && $x2 === $ox && $y2 === $oy) {
-                    $touches = true;
-                }
-                if (!$this->isFree($x2, $y2)) {
-                    continue;
-                }
-                $k = $y2 * $this->w + $x2;
-                if (!isset($seen[$k])) {
-                    $seen[$k] = true;
+        $free = $this->free;
+        while ($stack !== []) {
+            $c = array_pop($stack);
+            foreach ($this->offsets as $o) {
+                $n = $c + $o;
+                if ($free[$n] && $this->seen[$n] !== $s) {
+                    $this->seen[$n] = $s;
                     $count++;
-                    $queue[] = [$x2, $y2];
+                    $stack[] = $n;
                 }
             }
         }
 
-        return [$count, $touches];
+        return $count;
     }
 
-    /** @return array{int, int} cells I reach strictly first, cells the opponent reaches first */
-    private function voronoi(int $mx, int $my, int $ox, int $oy): array
+    /** @return array{int, int, bool} cells I reach first, cells the opponent reaches first, whether our regions touch */
+    private function voronoi(int $meIdx, int $opIdx): array
     {
-        $dist = [];
-        $owner = [];
-        // Opponent has not moved yet: it is one step "behind" in position, so it starts at 0 and I at 1.
-        $queue = [[$ox, $oy, 0, 2], [$mx, $my, 1, 1]];
-        $dist[$oy * $this->w + $ox] = 0;
-        $owner[$oy * $this->w + $ox] = 2;
-        $dist[$my * $this->w + $mx] = 1;
-        $owner[$my * $this->w + $mx] = 1;
+        $owner = [$opIdx => 2, $meIdx => 1];
+        $dist = [$opIdx => 0, $meIdx => 1];
+        $met = false;
+        foreach ($this->offsets as $o) {
+            if ($meIdx + $o === $opIdx) {
+                $met = true;
+            }
+        }
+        $front = [$opIdx];
+        $later = [$meIdx];
+        $depth = 0;
         $mine = 0;
         $theirs = 0;
-        // Process in order of distance (BFS with two seeds at different depth).
-        $front = [[$ox, $oy, 2]];
-        $next = [[$mx, $my, 1]];
-        $depth = 0;
-        while ($front !== [] || $next !== []) {
+        while ($front !== [] || $later !== []) {
             $new = [];
-            foreach ($front as [$x, $y, $who]) {
-                if ($owner[$y * $this->w + $x] === 0) {
+            foreach ($front as $c) {
+                $who = $owner[$c];
+                if ($who === 0) {
                     continue;
                 }
-                foreach (self::DIRS as $d) {
-                    $x2 = $x + $d->dx();
-                    $y2 = $y + $d->dy();
-                    if (!$this->isFree($x2, $y2)) {
+                foreach ($this->offsets as $o) {
+                    $n = $c + $o;
+                    if (!$this->free[$n]) {
                         continue;
                     }
-                    $k = $y2 * $this->w + $x2;
-                    if (!isset($dist[$k])) {
-                        $dist[$k] = $depth + 1;
-                        $owner[$k] = $who;
-                        $new[] = [$x2, $y2, $who];
-                    } elseif ($dist[$k] === $depth + 1 && $owner[$k] !== $who) {
-                        $owner[$k] = 0; // contested
+                    if (!isset($dist[$n])) {
+                        $dist[$n] = $depth + 1;
+                        $owner[$n] = $who;
+                        $new[] = $n;
+                    } elseif ($owner[$n] !== $who) {
+                        $met = true;
+                        if ($dist[$n] === $depth + 1) {
+                            $owner[$n] = 0;
+                        }
                     }
                 }
             }
-            $front = array_merge($new, $next);
-            $next = [];
+            $front = array_merge($new, $later);
+            $later = [];
             $depth++;
         }
-        foreach ($owner as $k => $who) {
+        unset($owner[$opIdx], $owner[$meIdx]);
+        foreach ($owner as $who) {
             if ($who === 1) {
                 $mine++;
             } elseif ($who === 2) {
@@ -190,6 +249,6 @@ final class SerpentSerreBot implements Bot
             }
         }
 
-        return [$mine, $theirs];
+        return [$mine, $theirs, $met];
     }
 }
